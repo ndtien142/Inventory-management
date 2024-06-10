@@ -53,10 +53,10 @@ require("./dbs/init.sqlserver");
 //     });
 // });
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/v1/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // init routers
-app.use("", require("./routers"));
+app.use("/v1/api", require("./routers"));
 
 // handling error
 app.use((req, res, next) => {

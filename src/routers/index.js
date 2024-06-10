@@ -9,7 +9,7 @@ const router = express.Router();
 // check permissions
 // router.use(permission("0000"));
 
-router.use("/v1/api/customers", require("./customer"));
-router.use("/v1/api", require("./access"));
+router.use("/customers", require("./customer"));
+router.use("", require("./access"));
 
 module.exports = router;

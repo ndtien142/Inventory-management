@@ -23,6 +23,12 @@ const options = {
                 bearerAuth: [],
             },
         ],
+        servers: [
+            {
+                url: `http://localhost:3055/v1/api`,
+                description: "Local development server",
+            },
+        ],
     },
     apis: ["./src/routers/*.js", "./src/routers/**/*.js"],
 };
