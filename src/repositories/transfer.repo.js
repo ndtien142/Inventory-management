@@ -1,13 +1,11 @@
 const dbService = require("../services/database.service");
 
-function getAllTransfers(callback) {
-    const query = `
-        SELECT * FROM Transfer;
-    `;
-    dbService.executeQuery(query, callback);
+async function getAllTransfers() {
+    const query = `SELECT * FROM Transfer;`;
+    return await dbService.executeQuery(query);
 }
 
-function getTransferById(transferId, callback) {
+async function getTransferById(transferId) {
     const query = `
         SELECT * FROM Transfer
         WHERE TransferID = @transferId;
@@ -15,10 +13,10 @@ function getTransferById(transferId, callback) {
     const params = [
         { name: "transferId", type: dbService.TYPES.Int, value: transferId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function addTransfer(transfer, callback) {
+async function addTransfer(transfer) {
     const query = `
         INSERT INTO Transfer (TransferQuantity, SentDate, ReceivedDate, Product_ProductId, Warehouse_WarehouseID_Source, Warehouse_WarehouseID_Destination)
         VALUES (@transferQuantity, @sentDate, @receivedDate, @productId, @sourceWarehouseId, @destinationWarehouseId);
@@ -55,10 +53,10 @@ function addTransfer(transfer, callback) {
             value: transfer.destinationWarehouseId,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function updateTransfer(transferId, transfer, callback) {
+async function updateTransfer(transferId, transfer) {
     const query = `
         UPDATE Transfer
         SET TransferQuantity = @transferQuantity,
@@ -102,10 +100,10 @@ function updateTransfer(transferId, transfer, callback) {
             value: transfer.destinationWarehouseId,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function deleteTransfer(transferId, callback) {
+async function deleteTransfer(transferId) {
     const query = `
         DELETE FROM Transfer
         WHERE TransferID = @transferId;
@@ -113,7 +111,7 @@ function deleteTransfer(transferId, callback) {
     const params = [
         { name: "transferId", type: dbService.TYPES.Int, value: transferId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
 module.exports = {

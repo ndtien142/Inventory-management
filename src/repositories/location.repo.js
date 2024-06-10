@@ -1,13 +1,13 @@
 const dbService = require("../services/database.service");
 
-function getAllLocations(callback) {
+async function getAllLocations() {
     const query = `
         SELECT * FROM Location;
     `;
-    dbService.executeQuery(query, callback);
+    return await dbService.executeQuery(query);
 }
 
-function getLocationById(locationId, callback) {
+async function getLocationById(locationId) {
     const query = `
         SELECT * FROM Location
         WHERE LocationID = @locationId;
@@ -15,10 +15,10 @@ function getLocationById(locationId, callback) {
     const params = [
         { name: "locationId", type: dbService.TYPES.Int, value: locationId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function addLocation(location, callback) {
+async function addLocation(location) {
     const query = `
         INSERT INTO Location (LocationName, LocationAddress)
         VALUES (@locationName, @locationAddress);
@@ -35,10 +35,10 @@ function addLocation(location, callback) {
             value: location.locationAddress,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function updateLocation(locationId, location, callback) {
+async function updateLocation(locationId, location) {
     const query = `
         UPDATE Location
         SET LocationName = @locationName,
@@ -58,10 +58,10 @@ function updateLocation(locationId, location, callback) {
             value: location.locationAddress,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function deleteLocation(locationId, callback) {
+async function deleteLocation(locationId) {
     const query = `
         DELETE FROM Location
         WHERE LocationID = @locationId;
@@ -69,7 +69,7 @@ function deleteLocation(locationId, callback) {
     const params = [
         { name: "locationId", type: dbService.TYPES.Int, value: locationId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
 module.exports = {

@@ -1,13 +1,11 @@
 const dbService = require("../services/database.service");
 
-function getAllWarehouses(callback) {
-    const query = `
-        SELECT * FROM Warehouse;
-    `;
-    dbService.executeQuery(query, callback);
+async function getAllWarehouses() {
+    const query = `SELECT * FROM Warehouse;`;
+    return await dbService.executeQuery(query);
 }
 
-function getWarehouseById(warehouseId, callback) {
+async function getWarehouseById(warehouseId) {
     const query = `
         SELECT * FROM Warehouse
         WHERE WarehouseID = @warehouseId;
@@ -15,10 +13,10 @@ function getWarehouseById(warehouseId, callback) {
     const params = [
         { name: "warehouseId", type: dbService.TYPES.Int, value: warehouseId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function addWarehouse(warehouse, callback) {
+async function addWarehouse(warehouse) {
     const query = `
         INSERT INTO Warehouse (WarehouseName, IsRefrigerated, Location_LocationID)
         VALUES (@warehouseName, @isRefrigerated, @locationId);
@@ -40,10 +38,10 @@ function addWarehouse(warehouse, callback) {
             value: warehouse.locationId,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function updateWarehouse(warehouseId, warehouse, callback) {
+async function updateWarehouse(warehouseId, warehouse) {
     const query = `
         UPDATE Warehouse
         SET WarehouseName = @warehouseName,
@@ -69,5 +67,12 @@ function updateWarehouse(warehouseId, warehouse, callback) {
             value: warehouse.locationId,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
+
+module.exports = {
+    getAllWarehouses,
+    getWarehouseById,
+    addWarehouse,
+    updateWarehouse,
+};

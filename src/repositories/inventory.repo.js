@@ -1,13 +1,13 @@
 const dbService = require("../services/database.service");
 
-function getAllInventory(callback) {
+async function getAllInventory() {
     const query = `
         SELECT * FROM Inventory;
     `;
-    dbService.executeQuery(query, callback);
+    return await dbService.executeQuery(query);
 }
 
-function getInventoryById(inventoryId, callback) {
+async function getInventoryById(inventoryId) {
     const query = `
         SELECT * FROM Inventory
         WHERE InventoryID = @inventoryId;
@@ -15,10 +15,10 @@ function getInventoryById(inventoryId, callback) {
     const params = [
         { name: "inventoryId", type: dbService.TYPES.Int, value: inventoryId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function addInventory(inventory, callback) {
+async function addInventory(inventory) {
     const query = `
         INSERT INTO Inventory (QuantityAvailable, MinimumStockLevel, MaximumStockLevel, ReorderPoint, Product_ProductId, Warehouse_WarehouseID)
         VALUES (@quantityAvailable, @minimumStockLevel, @maximumStockLevel, @reorderPoint, @productId, @warehouseId);
@@ -55,10 +55,10 @@ function addInventory(inventory, callback) {
             value: inventory.warehouseId,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function updateInventory(inventoryId, inventory, callback) {
+async function updateInventory(inventoryId, inventory) {
     const query = `
         UPDATE Inventory
         SET QuantityAvailable = @quantityAvailable,
@@ -102,10 +102,10 @@ function updateInventory(inventoryId, inventory, callback) {
             value: inventory.warehouseId,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function deleteInventory(inventoryId, callback) {
+async function deleteInventory(inventoryId) {
     const query = `
         DELETE FROM Inventory
         WHERE InventoryID = @inventoryId;
@@ -113,7 +113,7 @@ function deleteInventory(inventoryId, callback) {
     const params = [
         { name: "inventoryId", type: dbService.TYPES.Int, value: inventoryId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
 module.exports = {

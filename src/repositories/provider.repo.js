@@ -1,13 +1,11 @@
 const dbService = require("../services/database.service");
 
-function getAllProviders(callback) {
-    const query = `
-        SELECT * FROM Provider;
-    `;
-    dbService.executeQuery(query, callback);
+async function getAllProviders() {
+    const query = `SELECT * FROM Provider;`;
+    return await dbService.executeQuery(query);
 }
 
-function getProviderById(providerId, callback) {
+async function getProviderById(providerId) {
     const query = `
         SELECT * FROM Provider
         WHERE ProviderID = @providerId;
@@ -15,10 +13,10 @@ function getProviderById(providerId, callback) {
     const params = [
         { name: "providerId", type: dbService.TYPES.Int, value: providerId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function addProvider(provider, callback) {
+async function addProvider(provider) {
     const query = `
         INSERT INTO Provider (ProviderName, ProviderAddress)
         VALUES (@providerName, @providerAddress);
@@ -35,10 +33,10 @@ function addProvider(provider, callback) {
             value: provider.providerAddress,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function updateProvider(providerId, provider, callback) {
+async function updateProvider(providerId, provider) {
     const query = `
         UPDATE Provider
         SET ProviderName = @providerName,
@@ -58,10 +56,10 @@ function updateProvider(providerId, provider, callback) {
             value: provider.providerAddress,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function deleteProvider(providerId, callback) {
+async function deleteProvider(providerId) {
     const query = `
         DELETE FROM Provider
         WHERE ProviderID = @providerId;
@@ -69,7 +67,7 @@ function deleteProvider(providerId, callback) {
     const params = [
         { name: "providerId", type: dbService.TYPES.Int, value: providerId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
 module.exports = {

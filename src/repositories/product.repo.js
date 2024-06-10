@@ -1,13 +1,11 @@
 const dbService = require("../services/database.service");
 
-function getAllProducts(callback) {
-    const query = `
-        SELECT * FROM Product;
-    `;
-    dbService.executeQuery(query, callback);
+async function getAllProducts() {
+    const query = `SELECT * FROM Product;`;
+    return await dbService.executeQuery(query);
 }
 
-function getProductById(productId, callback) {
+async function getProductById(productId) {
     const query = `
         SELECT * FROM Product
         WHERE ProductId = @productId;
@@ -15,10 +13,10 @@ function getProductById(productId, callback) {
     const params = [
         { name: "productId", type: dbService.TYPES.Int, value: productId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function addProduct(product, callback) {
+async function addProduct(product) {
     const query = `
         INSERT INTO Product (ProductCode, Barcode, ProductName, ProductDescription, ProductCategory)
         VALUES (@productCode, @barcode, @productName, @productDescription, @productCategory);
@@ -50,10 +48,10 @@ function addProduct(product, callback) {
             value: product.productCategory,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function updateProduct(productId, product, callback) {
+async function updateProduct(productId, product) {
     const query = `
         UPDATE Product
         SET ProductCode = @productCode,
@@ -91,10 +89,10 @@ function updateProduct(productId, product, callback) {
             value: product.productCategory,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function deleteProduct(productId, callback) {
+async function deleteProduct(productId) {
     const query = `
         DELETE FROM Product
         WHERE ProductId = @productId;
@@ -102,7 +100,7 @@ function deleteProduct(productId, callback) {
     const params = [
         { name: "productId", type: dbService.TYPES.Int, value: productId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
 module.exports = {

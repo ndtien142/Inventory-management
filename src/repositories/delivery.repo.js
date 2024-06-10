@@ -1,13 +1,13 @@
 const dbService = require("../services/database.service");
 
-function getAllDeliveries(callback) {
+async function getAllDeliveries() {
     const query = `
         SELECT * FROM Delivery;
     `;
-    dbService.executeQuery(query, callback);
+    return await dbService.executeQuery(query);
 }
 
-function getDeliveryById(deliveryId, callback) {
+async function getDeliveryById(deliveryId) {
     const query = `
         SELECT * FROM Delivery
         WHERE DeliveryID = @deliveryId;
@@ -15,10 +15,10 @@ function getDeliveryById(deliveryId, callback) {
     const params = [
         { name: "deliveryId", type: dbService.TYPES.Int, value: deliveryId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executePreparedStatement(query, params);
 }
 
-function getDeliveryByIdWithDetails(deliveryId, callback) {
+async function getDeliveryByIdWithDetails(deliveryId) {
     const query = `
         SELECT d.DeliveryID, d.SalesDate, d.Customer_CustomerID,
                dd.DeliveryDetailID, dd.DeliveryQuantity, dd.ExpectedDate, dd.ActualDate,
@@ -30,10 +30,10 @@ function getDeliveryByIdWithDetails(deliveryId, callback) {
     const params = [
         { name: "deliveryId", type: dbService.TYPES.Int, value: deliveryId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executePreparedStatement(query, params);
 }
 
-function addDelivery(delivery, callback) {
+async function addDelivery(delivery) {
     const query = `
         INSERT INTO Delivery (SalesDate, Customer_CustomerID)
         VALUES (@salesDate, @customerId);
@@ -41,7 +41,7 @@ function addDelivery(delivery, callback) {
     const params = [
         {
             name: "salesDate",
-            type: dbService.TYPES.Int,
+            type: dbService.TYPES.Date, // Assuming salesDate is a Date type
             value: delivery.salesDate,
         },
         {
@@ -50,10 +50,10 @@ function addDelivery(delivery, callback) {
             value: delivery.customerId,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executePreparedStatement(query, params);
 }
 
-function updateDelivery(deliveryId, delivery, callback) {
+async function updateDelivery(deliveryId, delivery) {
     const query = `
         UPDATE Delivery
         SET SalesDate = @salesDate,
@@ -64,7 +64,7 @@ function updateDelivery(deliveryId, delivery, callback) {
         { name: "deliveryId", type: dbService.TYPES.Int, value: deliveryId },
         {
             name: "salesDate",
-            type: dbService.TYPES.Int,
+            type: dbService.TYPES.Date,
             value: delivery.salesDate,
         },
         {
@@ -73,10 +73,10 @@ function updateDelivery(deliveryId, delivery, callback) {
             value: delivery.customerId,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executePreparedStatement(query, params);
 }
 
-function deleteDelivery(deliveryId, callback) {
+async function deleteDelivery(deliveryId) {
     const query = `
         DELETE FROM Delivery
         WHERE DeliveryID = @deliveryId;
@@ -84,7 +84,7 @@ function deleteDelivery(deliveryId, callback) {
     const params = [
         { name: "deliveryId", type: dbService.TYPES.Int, value: deliveryId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executePreparedStatement(query, params);
 }
 
 module.exports = {

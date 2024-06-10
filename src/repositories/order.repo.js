@@ -1,13 +1,13 @@
 const dbService = require("../services/database.service");
 
-function getAllOrders(callback) {
+async function getAllOrders() {
     const query = `
         SELECT * FROM "Order";
     `;
-    dbService.executeQuery(query, callback);
+    return await dbService.executeQuery(query);
 }
 
-function getOrderById(orderId, callback) {
+async function getOrderById(orderId) {
     const query = `
         SELECT * FROM "Order"
         WHERE OrderID = @orderId;
@@ -15,10 +15,10 @@ function getOrderById(orderId, callback) {
     const params = [
         { name: "orderId", type: dbService.TYPES.Int, value: orderId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function getOrderByIdWithDetails(orderId, callback) {
+async function getOrderByIdWithDetails(orderId) {
     const query = `
         SELECT o.OrderID, o.OrderDate, o.Provider_ProviderID,
                od.OrderDetailID, od.OrderQuantity, od.ExpectedDate, od.ActualDate,
@@ -30,10 +30,10 @@ function getOrderByIdWithDetails(orderId, callback) {
     const params = [
         { name: "orderId", type: dbService.TYPES.Int, value: orderId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function addOrder(order, callback) {
+async function addOrder(order) {
     const query = `
         INSERT INTO "Order" (OrderDate, Provider_ProviderID)
         VALUES (@orderDate, @providerId);
@@ -50,10 +50,10 @@ function addOrder(order, callback) {
             value: order.providerId,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function updateOrder(orderId, order, callback) {
+async function updateOrder(orderId, order) {
     const query = `
         UPDATE "Order"
         SET OrderDate = @orderDate,
@@ -73,10 +73,10 @@ function updateOrder(orderId, order, callback) {
             value: order.providerId,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
-function deleteOrder(orderId, callback) {
+async function deleteOrder(orderId) {
     const query = `
         DELETE FROM "Order"
         WHERE OrderID = @orderId;
@@ -84,7 +84,7 @@ function deleteOrder(orderId, callback) {
     const params = [
         { name: "orderId", type: dbService.TYPES.Int, value: orderId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    return await dbService.executeQuery(query, params);
 }
 
 module.exports = {
