@@ -9,7 +9,7 @@ class ProductService {
     static async getAllProducts() {
         const products = await ProductRepository.getAllProducts();
         if (products.length === 0) {
-            throw new NotFoundError("No products found");
+            return [];
         }
         return products.map(
             (product) =>
@@ -40,7 +40,7 @@ class ProductService {
 
         const product = await ProductRepository.getProductById(productId);
         if (!product) {
-            throw new NotFoundError(`Product with ID ${productId} not found`);
+            throw new NotFoundError(`Product not found`);
         }
         return new Product(
             product.ProductId,

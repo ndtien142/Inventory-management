@@ -12,6 +12,7 @@ const router = express.Router();
 router.use("/customers", require("./customer"));
 router.use("/locations", require("./location"));
 router.use("/warehouses", require("./warehouse"));
+router.use("/products", require("./product"));
 router.use("", require("./access"));
 
 module.exports = router;
