@@ -13,12 +13,30 @@ async function getProviderById(providerId) {
     const params = [
         { name: "providerId", type: dbService.TYPES.Int, value: providerId },
     ];
-    return await dbService.executeQuery(query, params);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
+}
+
+async function getProviderByName(providerName) {
+    const query = `
+        SELECT * FROM Provider
+        WHERE ProviderName = @providerName;
+    `;
+    const params = [
+        {
+            name: "providerName",
+            type: dbService.TYPES.VarChar,
+            value: providerName,
+        },
+    ];
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 async function addProvider(provider) {
     const query = `
         INSERT INTO Provider (ProviderName, ProviderAddress)
+        OUTPUT INSERTED.*
         VALUES (@providerName, @providerAddress);
     `;
     const params = [
@@ -33,7 +51,8 @@ async function addProvider(provider) {
             value: provider.providerAddress,
         },
     ];
-    return await dbService.executeQuery(query, params);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 async function updateProvider(providerId, provider) {
@@ -41,6 +60,7 @@ async function updateProvider(providerId, provider) {
         UPDATE Provider
         SET ProviderName = @providerName,
             ProviderAddress = @providerAddress
+        OUTPUT INSERTED.*
         WHERE ProviderID = @providerId;
     `;
     const params = [
@@ -56,23 +76,27 @@ async function updateProvider(providerId, provider) {
             value: provider.providerAddress,
         },
     ];
-    return await dbService.executeQuery(query, params);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 async function deleteProvider(providerId) {
     const query = `
         DELETE FROM Provider
+        OUTPUT DELETED.*
         WHERE ProviderID = @providerId;
     `;
     const params = [
         { name: "providerId", type: dbService.TYPES.Int, value: providerId },
     ];
-    return await dbService.executeQuery(query, params);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 module.exports = {
     getAllProviders,
     getProviderById,
+    getProviderByName,
     addProvider,
     updateProvider,
     deleteProvider,
