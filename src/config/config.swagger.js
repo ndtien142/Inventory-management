@@ -30,7 +30,11 @@ const options = {
             },
         ],
     },
-    apis: ["./src/routers/*.js", "./src/routers/**/*.js"],
+    apis: [
+        "./src/routers/*.js",
+        "./src/routers/**/*.js",
+        "./src/docs/swagger/*.js",
+    ],
 };
 const swaggerSpec = swaggerJSDoc(options);
 module.exports = swaggerSpec;

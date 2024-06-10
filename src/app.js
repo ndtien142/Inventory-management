@@ -46,13 +46,6 @@ app.use(
 require("./dbs/init.mongodb");
 require("./dbs/init.sqlserver");
 
-// router
-// app.get("/", (req, res, next) => {
-//     return res.status(200).json({
-//         message: "Welcome to my backend app eCommerce!",
-//     });
-// });
-
 app.use("/v1/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // init routers

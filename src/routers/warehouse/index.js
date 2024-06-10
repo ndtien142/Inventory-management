@@ -15,33 +15,6 @@ const router = express.Router();
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Warehouse:
- *       type: object
- *       properties:
- *         warehouseId:
- *           type: integer
- *           description: The ID of the warehouse.
- *         warehouseName:
- *           type: string
- *           description: The name of the warehouse.
- *         isRefrigerated:
- *           type: boolean
- *           description: Indicates if the warehouse is refrigerated or not.
- *         location:
- *           type: object
- *           properties:
- *             locationId:
- *               type: integer
- *               description: The ID of the location.
- *             locationName:
- *               type: string
- *               description: The name of the location.
- *             locationAddress:
- *               type: string
- *               description: The address of the location.
- *
  * /warehouses:
  *   get:
  *     summary: Get all warehouses
@@ -91,65 +64,6 @@ router.get("/:warehouseId", asyncHandler(warehouseController.getWarehouseById));
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Location:
- *       type: object
- *       properties:
- *         locationId:
- *           type: integer
- *           description: The ID of the location.
- *         locationName:
- *           type: string
- *           description: The name of the location.
- *         locationAddress:
- *           type: string
- *           description: The address of the location.
- *     Warehouse:
- *       type: object
- *       properties:
- *         warehouseId:
- *           type: integer
- *           description: The ID of the warehouse.
- *         warehouseName:
- *           type: string
- *           description: The name of the warehouse.
- *         isRefrigerated:
- *           type: boolean
- *           description: Indicates if the warehouse is refrigerated or not.
- *         location:
- *           $ref: '#/components/schemas/Location'
- *     NewWarehouse:
- *       type: object
- *       properties:
- *         warehouseName:
- *           type: string
- *           description: The name of the warehouse.
- *           example: New Warehouse
- *         isRefrigerated:
- *           type: boolean
- *           description: Indicates if the warehouse is refrigerated or not.
- *           example: false
- *         locationId:
- *           type: integer
- *           description: The ID of the location.
- *           example: 1
- *     UpdateWarehouse:
- *       type: object
- *       properties:
- *         warehouseName:
- *           type: string
- *           description: The name of the warehouse.
- *           example: Updated Warehouse Name
- *         isRefrigerated:
- *           type: boolean
- *           description: Indicates if the warehouse is refrigerated or not.
- *           example: false
- *         locationId:
- *           type: integer
- *           description: The ID of the location.
- *           example: 1
- *
  * /warehouses:
  *   post:
  *     summary: Create a new warehouse
@@ -205,49 +119,6 @@ router.get("/:warehouseId", asyncHandler(warehouseController.getWarehouseById));
 router.post("", asyncHandler(warehouseController.createWarehouse));
 
 /**
- * @swagger
- * components:
- *   schemas:
- *     UpdateWarehouse:
- *       type: object
- *       properties:
- *         warehouseName:
- *           type: string
- *           description: The name of the warehouse.
- *           example: Updated Warehouse Name
- *         isRefrigerated:
- *           type: boolean
- *           description: Indicates if the warehouse is refrigerated or not.
- *           example: false
- *         locationId:
- *           type: integer
- *           description: The ID of the location.
- *           example: 1
- *     Warehouse:
- *       type: object
- *       properties:
- *         warehouseId:
- *           type: integer
- *           description: The ID of the warehouse.
- *         warehouseName:
- *           type: string
- *           description: The name of the warehouse.
- *         isRefrigerated:
- *           type: boolean
- *           description: Indicates if the warehouse is refrigerated or not.
- *         location:
- *           type: object
- *           properties:
- *             locationId:
- *               type: integer
- *               description: The ID of the location.
- *             locationName:
- *               type: string
- *               description: The name of the location.
- *             locationAddress:
- *               type: string
- *               description: The address of the location.
- *
  * /warehouses/{warehouseId}:
  *   put:
  *     summary: Update warehouse by ID
