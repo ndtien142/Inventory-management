@@ -10,6 +10,7 @@ const router = express.Router();
 // router.use(permission("0000"));
 
 router.use("/customers", require("./customer"));
+router.use("/locations", require("./location"));
 router.use("", require("./access"));
 
 module.exports = router;

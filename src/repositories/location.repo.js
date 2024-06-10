@@ -21,6 +21,7 @@ async function getLocationById(locationId) {
 async function addLocation(location) {
     const query = `
         INSERT INTO Location (LocationName, LocationAddress)
+        OUTPUT INSERTED.*
         VALUES (@locationName, @locationAddress);
     `;
     const params = [
@@ -35,7 +36,8 @@ async function addLocation(location) {
             value: location.locationAddress,
         },
     ];
-    return await dbService.executeQuery(query, params);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 async function updateLocation(locationId, location) {
@@ -43,6 +45,7 @@ async function updateLocation(locationId, location) {
         UPDATE Location
         SET LocationName = @locationName,
             LocationAddress = @locationAddress
+        OUTPUT INSERTED.*
         WHERE LocationID = @locationId;
     `;
     const params = [
@@ -58,18 +61,21 @@ async function updateLocation(locationId, location) {
             value: location.locationAddress,
         },
     ];
-    return await dbService.executeQuery(query, params);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 async function deleteLocation(locationId) {
     const query = `
         DELETE FROM Location
+        OUTPUT DELETED.*
         WHERE LocationID = @locationId;
     `;
     const params = [
         { name: "locationId", type: dbService.TYPES.Int, value: locationId },
     ];
-    return await dbService.executeQuery(query, params);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 module.exports = {
