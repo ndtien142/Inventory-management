@@ -20,7 +20,8 @@ const config = {
         database: database,
     },
 };
-var connection = new Connection(config);
+
+const connection = new Connection(config);
 connection.on("connect", function (err) {
     // If no error, then good to proceed.
     console.log("Connected to SQL Server Successfully");

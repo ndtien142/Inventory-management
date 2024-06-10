@@ -6,17 +6,17 @@ const dev = {
         user: process.env.DEV_DB_USER || "sa",
         password: process.env.DEV_DB_PASSWORD || "123",
         port: process.env.DEV_DB_PORT || 1433,
-        database: process.env.DEV_DB_DATABASE || "inventory_management",
+        database: process.env.DEV_DB_DATABASE || "InventoryManagement",
     },
 };
 
 const pro = {
     db: {
         host: process.env.PRO_DB_SERVER_NAME || `DESKTOP-LDUQE6I`,
-        user: process.env.PRO_DB_USER || "inventory_management",
+        user: process.env.PRO_DB_USER || "sa",
         password: process.env.PRO_DB_PASSWORD || "123",
         port: process.env.PRO_DB_PORT || 1433,
-        database: process.env.PRO_DB_DATABASE || "inventory_management",
+        database: process.env.PRO_DB_DATABASE || "InventoryManagement",
     },
 };
 
