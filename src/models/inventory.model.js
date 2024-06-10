@@ -10,17 +10,25 @@ class Inventory {
         minimumStockLevel,
         maximumStockLevel,
         reorderPoint,
-        product,
-        warehouse
+        product = new Product(),
+        warehouse = new Warehouse()
     ) {
         this.inventoryId = inventoryId;
         this.quantityAvailable = quantityAvailable;
         this.minimumStockLevel = minimumStockLevel;
         this.maximumStockLevel = maximumStockLevel;
         this.reorderPoint = reorderPoint;
-        this.product = product instanceof Product ? product : new Product();
-        this.warehouse =
-            warehouse instanceof Warehouse ? warehouse : new Warehouse();
+
+        if (product instanceof Product) {
+            this.product = product;
+        } else {
+            this.product = new Product();
+        }
+        if (warehouse instanceof Warehouse) {
+            this.warehouse = warehouse;
+        } else {
+            this.warehouse = new Warehouse();
+        }
     }
 }
 

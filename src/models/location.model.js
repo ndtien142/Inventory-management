@@ -1,8 +1,8 @@
 "use strict";
 
 class Location {
-    constructor(locationID, locationName, locationAddress) {
-        this.locationID = locationID;
+    constructor(locationId, locationName, locationAddress) {
+        this.locationId = locationId;
         this.locationName = locationName;
         this.locationAddress = locationAddress;
     }

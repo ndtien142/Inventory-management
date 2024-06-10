@@ -3,8 +3,8 @@
 const Location = require("./location.model");
 
 class Warehouse {
-    constructor(warehouseID, warehouseName, isRefrigerated, location) {
-        this.warehouseID = warehouseID;
+    constructor(warehouseId, warehouseName, isRefrigerated, location) {
+        this.warehouseId = warehouseId;
         this.warehouseName = warehouseName;
         this.isRefrigerated = isRefrigerated;
         this.location =

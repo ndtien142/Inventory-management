@@ -36,9 +36,9 @@ router.get("", asyncHandler(locationController.getAllLocations));
  * @swagger
  * /locations/{locationId}:
  *   get:
- *     summary: Get location by ID
+ *     summary: Get location by Id
  *     tags: [Locations]
- *     description: Retrieve a location by its ID.
+ *     description: Retrieve a location by its Id.
  *     parameters:
  *       - in: path
  *         name: locationId
@@ -47,7 +47,7 @@ router.get("", asyncHandler(locationController.getAllLocations));
  *           type: integer
  *     responses:
  *       200:
- *         description: Location details by ID
+ *         description: Location details by Id
  *         content:
  *           application/json:
  *             schema:
@@ -88,9 +88,9 @@ router.post("", asyncHandler(locationController.createLocation));
  * @swagger
  * /locations/{locationId}:
  *   put:
- *     summary: Update location by ID
+ *     summary: Update location by Id
  *     tags: [Locations]
- *     description: Update an existing location by its ID.
+ *     description: Update an existing location by its Id.
  *     parameters:
  *       - in: path
  *         name: locationId
@@ -120,9 +120,9 @@ router.put("/:locationId", asyncHandler(locationController.updateLocation));
  * @swagger
  * /locations/{locationId}:
  *   delete:
- *     summary: Delete location by ID
+ *     summary: Delete location by Id
  *     tags: [Locations]
- *     description: Delete an existing location by its ID.
+ *     description: Delete an existing location by its Id.
  *     parameters:
  *       - in: path
  *         name: locationId

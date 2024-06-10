@@ -1,27 +1,41 @@
+"use strict";
+
 const dbService = require("../services/database.service");
 
-async function getAllInventory() {
+async function getAllInventories() {
     const query = `
-        SELECT * FROM Inventory;
+        SELECT i.InventoryID, i.QuantityAvailable, i.MinimumStockLevel, i.MaximumStockLevel,
+               i.ReorderPoint, p.*, w.*
+        FROM Inventory i
+        INNER JOIN Product p ON i.Product_ProductId = p.ProductId
+        INNER JOIN Warehouse w ON i.Warehouse_WarehouseID = w.WarehouseID;
     `;
     return await dbService.executeQuery(query);
 }
 
 async function getInventoryById(inventoryId) {
     const query = `
-        SELECT * FROM Inventory
-        WHERE InventoryID = @inventoryId;
+        SELECT i.InventoryID, i.QuantityAvailable, i.MinimumStockLevel, i.MaximumStockLevel,
+               i.ReorderPoint, p.*, w.*
+        FROM Inventory i
+        INNER JOIN Product p ON i.Product_ProductId = p.ProductId
+        INNER JOIN Warehouse w ON i.Warehouse_WarehouseID = w.WarehouseID
+        WHERE i.InventoryID = @inventoryId;
     `;
     const params = [
         { name: "inventoryId", type: dbService.TYPES.Int, value: inventoryId },
     ];
-    return await dbService.executeQuery(query, params);
+    const results = await dbService.executeQuery(query, params);
+    return results.length > 0 ? results[0] : null;
 }
 
 async function addInventory(inventory) {
     const query = `
-        INSERT INTO Inventory (QuantityAvailable, MinimumStockLevel, MaximumStockLevel, ReorderPoint, Product_ProductId, Warehouse_WarehouseID)
-        VALUES (@quantityAvailable, @minimumStockLevel, @maximumStockLevel, @reorderPoint, @productId, @warehouseId);
+        INSERT INTO Inventory (QuantityAvailable, MinimumStockLevel, MaximumStockLevel,
+                               ReorderPoint, Product_ProductId, Warehouse_WarehouseID)
+        OUTPUT INSERTED.*
+        VALUES (@quantityAvailable, @minimumStockLevel, @maximumStockLevel,
+                @reorderPoint, @productId, @warehouseId);
     `;
     const params = [
         {
@@ -47,15 +61,16 @@ async function addInventory(inventory) {
         {
             name: "productId",
             type: dbService.TYPES.Int,
-            value: inventory.productId,
+            value: inventory.product.productId,
         },
         {
             name: "warehouseId",
             type: dbService.TYPES.Int,
-            value: inventory.warehouseId,
+            value: inventory.warehouse.warehouseId,
         },
     ];
-    return await dbService.executeQuery(query, params);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 async function updateInventory(inventoryId, inventory) {
@@ -67,6 +82,7 @@ async function updateInventory(inventoryId, inventory) {
             ReorderPoint = @reorderPoint,
             Product_ProductId = @productId,
             Warehouse_WarehouseID = @warehouseId
+        OUTPUT INSERTED.*
         WHERE InventoryID = @inventoryId;
     `;
     const params = [
@@ -94,30 +110,33 @@ async function updateInventory(inventoryId, inventory) {
         {
             name: "productId",
             type: dbService.TYPES.Int,
-            value: inventory.productId,
+            value: inventory.product.productId,
         },
         {
             name: "warehouseId",
             type: dbService.TYPES.Int,
-            value: inventory.warehouseId,
+            value: inventory.warehouse.warehouseId,
         },
     ];
-    return await dbService.executeQuery(query, params);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 async function deleteInventory(inventoryId) {
     const query = `
         DELETE FROM Inventory
+        OUTPUT DELETED.*
         WHERE InventoryID = @inventoryId;
     `;
     const params = [
         { name: "inventoryId", type: dbService.TYPES.Int, value: inventoryId },
     ];
-    return await dbService.executeQuery(query, params);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 module.exports = {
-    getAllInventory,
+    getAllInventories,
     getInventoryById,
     addInventory,
     updateInventory,

@@ -38,9 +38,7 @@ class WarehouseService {
         const warehouse =
             await WarehouseRepository.getWarehouseById(warehouseId);
         if (!warehouse) {
-            throw new NotFoundError(
-                `Warehouse with ID ${warehouseId} not found`
-            );
+            throw new NotFoundError(`Warehouse not found`);
         }
         return new Warehouse(
             warehouse.WarehouseID,

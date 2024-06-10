@@ -20,7 +20,7 @@ const router = express.Router();
  *     Warehouse:
  *       type: object
  *       properties:
- *         warehouseID:
+ *         warehouseId:
  *           type: integer
  *           description: The ID of the warehouse.
  *         warehouseName:
@@ -32,7 +32,7 @@ const router = express.Router();
  *         location:
  *           type: object
  *           properties:
- *             locationID:
+ *             locationId:
  *               type: integer
  *               description: The ID of the location.
  *             locationName:
@@ -96,7 +96,7 @@ router.get("/:warehouseId", asyncHandler(warehouseController.getWarehouseById));
  *     Location:
  *       type: object
  *       properties:
- *         locationID:
+ *         locationId:
  *           type: integer
  *           description: The ID of the location.
  *         locationName:
@@ -108,7 +108,7 @@ router.get("/:warehouseId", asyncHandler(warehouseController.getWarehouseById));
  *     Warehouse:
  *       type: object
  *       properties:
- *         warehouseID:
+ *         warehouseId:
  *           type: integer
  *           description: The ID of the warehouse.
  *         warehouseName:
@@ -130,7 +130,7 @@ router.get("/:warehouseId", asyncHandler(warehouseController.getWarehouseById));
  *           type: boolean
  *           description: Indicates if the warehouse is refrigerated or not.
  *           example: false
- *         locationID:
+ *         locationId:
  *           type: integer
  *           description: The ID of the location.
  *           example: 1
@@ -145,7 +145,7 @@ router.get("/:warehouseId", asyncHandler(warehouseController.getWarehouseById));
  *           type: boolean
  *           description: Indicates if the warehouse is refrigerated or not.
  *           example: false
- *         locationID:
+ *         locationId:
  *           type: integer
  *           description: The ID of the location.
  *           example: 1
@@ -219,14 +219,14 @@ router.post("", asyncHandler(warehouseController.createWarehouse));
  *           type: boolean
  *           description: Indicates if the warehouse is refrigerated or not.
  *           example: false
- *         locationID:
+ *         locationId:
  *           type: integer
  *           description: The ID of the location.
  *           example: 1
  *     Warehouse:
  *       type: object
  *       properties:
- *         warehouseID:
+ *         warehouseId:
  *           type: integer
  *           description: The ID of the warehouse.
  *         warehouseName:
@@ -238,7 +238,7 @@ router.post("", asyncHandler(warehouseController.createWarehouse));
  *         location:
  *           type: object
  *           properties:
- *             locationID:
+ *             locationId:
  *               type: integer
  *               description: The ID of the location.
  *             locationName:

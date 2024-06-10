@@ -37,9 +37,9 @@ router.get("", asyncHandler(customerController.getAllCustomers));
  * @swagger
  * /customers/{customerId}:
  *   get:
- *     summary: Get customer by ID
+ *     summary: Get customer by Id
  *     tags: [Customers]
- *     description: Retrieve a customer by their ID.
+ *     description: Retrieve a customer by their Id.
  *     parameters:
  *       - in: path
  *         name: customerId
@@ -48,7 +48,7 @@ router.get("", asyncHandler(customerController.getAllCustomers));
  *           type: integer
  *     responses:
  *       200:
- *         description: Customer details by ID
+ *         description: Customer details by Id
  *         content:
  *           application/json:
  *             schema:
@@ -89,9 +89,9 @@ router.post("", asyncHandler(customerController.createCustomer));
  * @swagger
  * /customers/{customerId}:
  *   put:
- *     summary: Update customer by ID
+ *     summary: Update customer by Id
  *     tags: [Customers]
- *     description: Update an existing customer by their ID.
+ *     description: Update an existing customer by their Id.
  *     parameters:
  *       - in: path
  *         name: customerId
@@ -121,9 +121,9 @@ router.put("/:customerId", asyncHandler(customerController.updateCustomer));
  * @swagger
  * /customers/{customerId}:
  *   delete:
- *     summary: Delete customer by ID
+ *     summary: Delete customer by Id
  *     tags: [Customers]
- *     description: Delete an existing customer by their ID.
+ *     description: Delete an existing customer by their Id.
  *     parameters:
  *       - in: path
  *         name: customerId
