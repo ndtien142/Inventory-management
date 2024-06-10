@@ -1,13 +1,12 @@
 "use strict";
 
-const { Connection, Request } = require("tedious");
+const { Connection, Request, TYPES } = require("tedious");
 const {
     db: { host, user, password, database },
 } = require("../config/config.sqlserver");
 
-// Thông tin kết nối cơ sở dữ liệu
 const config = {
-    server: `${host}.database.windows.net`,
+    server: host,
     authentication: {
         type: "default",
         options: {
@@ -18,35 +17,57 @@ const config = {
     options: {
         database: database,
         encrypt: true,
+        trustServerCertificate: true,
+        connectTimeout: 15000,
+        requestTimeout: 15000,
+        port: 1433,
+        rowCollectionOnRequestCompletion: true,
     },
 };
 
-const connection = new Connection(config);
-
-connection.on("connect", function (err) {
-    if (err) {
-        console.error("Error connecting to SQL Server:", err.message);
-    } else {
-        console.log("Connected to SQL Server successfully");
-    }
-});
-
-function executeQuery(query, callback) {
-    const request = new Request(query, function (err, rowCount, rows) {
-        if (err) {
-            callback(err);
-        } else {
-            callback(null, { rowCount: rowCount, rows: rows });
-        }
-    });
-
-    connection.execSql(request);
+function createConnection() {
+    return new Connection(config);
 }
 
-process.on("exit", () => {
-    connection.close();
-});
+function executeQuery(query, params = []) {
+    return new Promise((resolve, reject) => {
+        const connection = createConnection();
+
+        connection.on("connect", (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+
+            const request = new Request(query, function (err, rowCount, rows) {
+                if (err) {
+                    reject(err);
+                } else {
+                    const results = [];
+                    rows.forEach((row) => {
+                        const result = {};
+                        row.forEach((column) => {
+                            result[column.metadata.colName] = column.value;
+                        });
+                        results.push(result);
+                    });
+                    resolve(results);
+                }
+            });
+
+            // Add parameters to the request if any
+            params.forEach((param) => {
+                request.addParameter(param.name, param.type, param.value);
+            });
+
+            connection.execSql(request);
+        });
+
+        connection.connect();
+    });
+}
 
 module.exports = {
     executeQuery,
+    TYPES,
 };

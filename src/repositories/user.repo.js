@@ -1,26 +1,36 @@
 const dbService = require("../services/database.service");
 
-function getAllCustomers(callback) {
-    const query = `
-        SELECT * FROM Customer;
-    `;
-    dbService.executeQuery(query, callback);
+async function getAllCustomers() {
+    const query = `SELECT * FROM Customer;`;
+    return await dbService.executeQuery(query);
 }
 
-function getCustomerById(customerId, callback) {
-    const query = `
-        SELECT * FROM Customer
-        WHERE CustomerID = @customerId;
-    `;
+async function getCustomerById(customerId) {
+    const query = `SELECT * FROM Customer WHERE CustomerID = @customerId;`;
     const params = [
         { name: "customerId", type: dbService.TYPES.Int, value: customerId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
-function addCustomer(customer, callback) {
+async function getCustomerByName(customerName) {
+    const query = `SELECT CustomerID, CustomerName, CustomerAddress FROM Customer WHERE CustomerName = @customerName;`;
+    const params = [
+        {
+            name: "customerName",
+            type: dbService.TYPES.VarChar,
+            value: customerName,
+        },
+    ];
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
+}
+
+async function addCustomer(customer) {
     const query = `
         INSERT INTO Customer (CustomerName, CustomerAddress)
+        OUTPUT INSERTED.*
         VALUES (@customerName, @customerAddress);
     `;
     const params = [
@@ -35,14 +45,16 @@ function addCustomer(customer, callback) {
             value: customer.customerAddress,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
-function updateCustomer(customerId, customer, callback) {
+async function updateCustomer(customerId, customer) {
     const query = `
         UPDATE Customer
         SET CustomerName = @customerName,
             CustomerAddress = @customerAddress
+        OUTPUT INSERTED.*
         WHERE CustomerID = @customerId;
     `;
     const params = [
@@ -58,23 +70,27 @@ function updateCustomer(customerId, customer, callback) {
             value: customer.customerAddress,
         },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
-function deleteCustomer(customerId, callback) {
+async function deleteCustomer(customerId) {
     const query = `
         DELETE FROM Customer
+        OUTPUT DELETED.*
         WHERE CustomerID = @customerId;
     `;
     const params = [
         { name: "customerId", type: dbService.TYPES.Int, value: customerId },
     ];
-    dbService.executePreparedStatement(query, params, callback);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 module.exports = {
     getAllCustomers,
     getCustomerById,
+    getCustomerByName,
     addCustomer,
     updateCustomer,
     deleteCustomer,

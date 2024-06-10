@@ -6,7 +6,7 @@ const {
 } = require("../config/config.sqlserver");
 
 const config = {
-    server: `${host}.database.windows.net`,
+    server: `${host}`,
     authentication: {
         type: "default",
         options: {
@@ -16,15 +16,22 @@ const config = {
     },
     options: {
         // If you are on Microsoft Azure, you need encryption:
-        // encrypt: true,
         database: database,
+        encrypt: true,
+        trustServerCertificate: true, // Trust the self-signed certificate
+        connectTimeout: 15000,
+        requestTimeout: 15000,
+        port: 1433,
     },
 };
 
 const connection = new Connection(config);
 connection.on("connect", function (err) {
-    // If no error, then good to proceed.
-    console.log("Connected to SQL Server Successfully");
+    if (err) {
+        console.log("Error: ", err);
+    } else {
+        console.log("Connected to SQL Server Successfully");
+    }
 });
 
 connection.connect();
