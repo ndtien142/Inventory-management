@@ -1,16 +1,16 @@
 "user strict";
 
-const accountModel = require("../models/account.model");
+const accountModel = require("../../models/account.model");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const KeyTokenService = require("./keytoken.service");
-const { createTokenPair, verifyJWT } = require("../auth/authUtils");
-const { getInfoData } = require("../utils");
+const { createTokenPair, verifyJWT } = require("../../auth/authUtils");
+const { getInfoData } = require("../../utils");
 const {
     BadRequestError,
     AuthFailureError,
     ForbiddenError,
-} = require("../core/error.response");
+} = require("../../core/error.response");
 const { findByEmail } = require("./account.service");
 
 const RoleLandingPage = {
@@ -24,9 +24,8 @@ class AccessService {
         1 - check this token used
     */
     static handlerRefreshToken = async (refreshToken) => {
-        const foundToken = await KeyTokenService.findByRefreshTokenUsed(
-            refreshToken
-        );
+        const foundToken =
+            await KeyTokenService.findByRefreshTokenUsed(refreshToken);
         if (foundToken) {
             // decode xem co trong he thong hay khong
             const { userId, email } = await verifyJWT(
@@ -41,9 +40,8 @@ class AccessService {
             );
         }
 
-        const holderToken = await KeyTokenService.findByRefreshToken(
-            refreshToken
-        );
+        const holderToken =
+            await KeyTokenService.findByRefreshToken(refreshToken);
 
         if (!holderToken) throw new AuthFailureError("Email not registered!");
 
