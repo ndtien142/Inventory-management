@@ -32,7 +32,6 @@ class AccessService {
                 refreshToken,
                 foundToken.privateKey
             );
-            console.log({ userId, email });
             // delete all token in keyStore
             await KeyTokenService.deleteKeyById(userId);
             throw new ForbiddenError(
@@ -50,7 +49,6 @@ class AccessService {
             refreshToken,
             holderToken.privateKey
         );
-        console.log("[2]--", { userId, email });
         // check UserId
         const foundEmail = await findByEmail({ email });
         if (!foundEmail) throw new AuthFailureError("Email not registered!");
@@ -224,7 +222,6 @@ class AccessService {
             // system store public key
             // private key use to sync token
             // public key use to verify token
-            console.log("crete new");
             const { privateKey, publicKey } = crypto.generateKeyPairSync(
                 "rsa",
                 {
@@ -241,8 +238,6 @@ class AccessService {
                     },
                 }
             );
-            console.log("private key: " + privateKey);
-            console.log("public key: " + publicKey);
             // if exist handle save to collection KeyStore
 
             const publicKeyString = await KeyTokenService.createKeyToken({
@@ -262,7 +257,6 @@ class AccessService {
                 publicKeyObject,
                 privateKey
             );
-            console.log("create token pair success: " + tokens);
 
             return {
                 code: 201,

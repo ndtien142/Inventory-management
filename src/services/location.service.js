@@ -30,7 +30,7 @@ class LocationService {
 
         const location = await LocationRepository.getLocationById(locationId);
         if (!location) {
-            throw new NotFoundError(`Location with ID ${locationId} not found`);
+            throw new NotFoundError(`Location not found`);
         }
         return new Location(
             location.LocationID,

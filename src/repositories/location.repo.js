@@ -15,7 +15,8 @@ async function getLocationById(locationId) {
     const params = [
         { name: "locationId", type: dbService.TYPES.Int, value: locationId },
     ];
-    return await dbService.executeQuery(query, params);
+    const result = await dbService.executeQuery(query, params);
+    return result[0];
 }
 
 async function addLocation(location) {
