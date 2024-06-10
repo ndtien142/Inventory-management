@@ -4,6 +4,8 @@ const express = require("express");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./config/config.swagger");
 
 const app = express();
 
@@ -42,6 +44,7 @@ app.use(
 
 // init db
 require("./dbs/init.mongodb");
+require("./dbs/init.sqlserver");
 
 // router
 // app.get("/", (req, res, next) => {
@@ -49,6 +52,8 @@ require("./dbs/init.mongodb");
 //         message: "Welcome to my backend app eCommerce!",
 //     });
 // });
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // init routers
 app.use("", require("./routers"));
