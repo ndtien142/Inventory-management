@@ -1,6 +1,6 @@
 "user strict";
 
-const accountModel = require("../../models/account.model");
+const accountModel = require("../../models/authentication/account.model");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const KeyTokenService = require("./keytoken.service");
