@@ -1,12 +1,26 @@
 "use strict";
 
-class Unit {
-    constructor({ id, name, createTime, updateTime }) {
-        this.id = id;
-        this.name = name;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
-}
+const { DataTypes } = require("sequelize");
 
-module.exports = Unit;
+module.exports = model;
+
+function model(sequelize) {
+    const attributes = {
+        id: {
+            type: DataTypes.BIGINT,
+            autoIncrement: true,
+            primaryKey: true,
+            allowNull: false,
+        },
+        name: { type: DataTypes.STRING(255), allowNull: false, unique: true },
+    };
+
+    const options = {
+        tableName: "tb_unit",
+        timestamps: true,
+        createdAt: "create_time",
+        updatedAt: "update_time",
+    };
+
+    return sequelize.define("Unit", attributes, options);
+}

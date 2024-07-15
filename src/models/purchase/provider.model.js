@@ -1,14 +1,32 @@
 "use strict";
 
-class Provider {
-    constructor({ id, name, contactInfo, isActive, createTime, updateTime }) {
-        this.id = id;
-        this.name = name;
-        this.contactInfo = contactInfo;
-        this.isActive = isActive;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
-}
+const { DataTypes } = require("sequelize");
 
-module.exports = Provider;
+module.exports = model;
+
+function model(sequelize) {
+    const attributes = {
+        id: {
+            type: DataTypes.BIGINT,
+            autoIncrement: true,
+            primaryKey: true,
+            allowNull: false,
+        },
+        name: { type: DataTypes.STRING(1000), allowNull: false, unique: true },
+        contact_infor: { type: DataTypes.TEXT, allowNull: false },
+        is_active: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+            allowNull: false,
+        },
+    };
+
+    const options = {
+        tableName: "tb_provider",
+        timestamps: true,
+        createdAt: "create_time",
+        updatedAt: "update_time",
+    };
+
+    return sequelize.define("Provider", attributes, options);
+}

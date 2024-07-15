@@ -12,20 +12,21 @@ function model(sequelize) {
             primaryKey: true,
             allowNull: false,
         },
-        brand_name: {
-            type: DataTypes.STRING(255),
+        name: { type: DataTypes.STRING(100), allowNull: false },
+        description: { type: DataTypes.STRING(255), allowNull: true },
+        is_active: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: 1,
             allowNull: false,
-            unique: true,
         },
-        brand_description: { type: DataTypes.TEXT, allowNull: true },
     };
 
     const options = {
-        tableName: "tb_brand",
+        tableName: "payment_methods",
         timestamps: true,
         createdAt: "create_time",
         updatedAt: "update_time",
     };
 
-    return sequelize.define("Brand", attributes, options);
+    return sequelize.define("PaymentMethod", attributes, options);
 }

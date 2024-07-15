@@ -29,10 +29,42 @@ async function initialize() {
     );
 
     // init models and add them to the exported db object
-    // db.User = require("../models/test/user.model")(sequelize);
+    db.PaymentMethod = require("../models/payment/paymentMethod.model")(
+        sequelize
+    );
+    db.Brand = require("../models/product/brand.model")(sequelize);
+    db.Provider = require("../models/purchase/provider.model")(sequelize);
+    db.Role = require("../models/authentication/role.model")(sequelize);
+    db.Account = require("../models/authentication/account.model")(sequelize);
+    db.Unit = require("../models/product/unit.model")(sequelize);
+    db.Account = require("../models/authentication/account.model")(sequelize);
+    db.Cart = require("../models/order/cart.model")(sequelize);
+    db.Category = require("../models/product/category.model")(sequelize);
+    db.CustomerAddress = require("../models/user/customerAddress.model")(
+        sequelize
+    );
+    db.Order = require("../models/order/order.model")(sequelize);
+    db.Profile = require("../models/user/profile.model")(sequelize);
+    db.Purchase = require("../models/purchase/purchase.model")(sequelize);
+    db.DetailPurchaseActivity =
+        require("../models/purchase/detailPurchaseActivity.model")(sequelize);
+    db.PaymentTransactions =
+        require("../models/payment/paymentTransaction.model")(sequelize);
+    db.Product = require("../models/product/product.model")(sequelize);
+    db.SKU = require("../models/product/sku.model")(sequelize);
+    db.UnitConversion = require("../models/product/unitConversion.model")(
+        sequelize
+    );
+    db.CartLineItem = require("../models/order/cartLineItem.model")(sequelize);
+    db.DetailPurchase = require("../models/purchase/detailPurchase.model")(
+        sequelize
+    );
+    db.OrderLineItem = require("../models/order/orderLineItem.model")(
+        sequelize
+    );
 
     // sync all models with database
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
 }
 
 async function ensureDbExists(dbName) {

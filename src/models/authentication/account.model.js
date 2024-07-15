@@ -1,27 +1,46 @@
 "use strict";
 
-const Role = require("./role.model");
+const { DataTypes } = require("sequelize");
 
-class Account {
-    constructor({
-        userCode,
-        username,
-        password,
-        isActive,
-        isBlock,
-        role,
-        createTime,
-        updateTime,
-    }) {
-        this.customerId = userCode;
-        this.customerName = username;
-        this.customerAddress = password;
-        this.isActive = isActive;
-        this.isBlock = isBlock;
-        this.role = role instanceof Role ? role : new Role();
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
+module.exports = model;
+
+function model(sequelize) {
+    const attributes = {
+        user_code: {
+            type: DataTypes.STRING(20),
+            primaryKey: true,
+            allowNull: false,
+        },
+        username: {
+            type: DataTypes.STRING(255),
+            allowNull: false,
+            unique: true,
+        },
+        password: { type: DataTypes.STRING(255), allowNull: false },
+        fk_role_id: {
+            type: DataTypes.TINYINT,
+            allowNull: false,
+            references: { model: "tb_role", key: "id" },
+        },
+        is_active: { type: DataTypes.BOOLEAN, allowNull: false },
+        is_block: { type: DataTypes.BOOLEAN, allowNull: false },
+    };
+
+    const options = {
+        tableName: "tb_account",
+        timestamps: true,
+        createdAt: "create_time",
+        updatedAt: "update_time",
+    };
+
+    const Account = sequelize.define("Account", attributes, options);
+
+    Account.associate = function (models) {
+        Account.belongsTo(models.Role, {
+            foreignKey: "fk_role_id",
+            as: "role",
+        });
+    };
+
+    return Account;
 }
-
-module.exports = Account;

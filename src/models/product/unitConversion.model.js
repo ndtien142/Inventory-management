@@ -1,29 +1,48 @@
-"use strict";
+const { DataTypes } = require("sequelize");
 
-const Product = require("./product.model");
-const Unit = require("./unit.model");
+module.exports = model;
 
-class UnitConversion {
-    constructor({
-        id,
-        baseUnit,
-        conversionUnit,
-        rateConversion,
-        product,
-        isDeleted,
-        createTime,
-        updateTime,
-    }) {
-        this.id = id;
-        this.baseUnit = baseUnit instanceof Unit ? baseUnit : new Unit();
-        this.conversionUnit =
-            conversionUnit instanceof Unit ? conversionUnit : new Unit();
-        this.rateConversion = rateConversion;
-        this.product = product instanceof Product ? product : new Product();
-        this.isDeleted = isDeleted;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
+function model(sequelize) {
+    const attributes = {
+        id: { type: DataTypes.BIGINT, primaryKey: true },
+        base_unit_id: { type: DataTypes.BIGINT, allowNull: false },
+        conversion_unit_id: { type: DataTypes.BIGINT, allowNull: false },
+        rate_conversion: { type: DataTypes.FLOAT, allowNull: false },
+        is_deleted: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            allowNull: true,
+        },
+        fk_product_id: { type: DataTypes.STRING(100), allowNull: true },
+    };
+
+    const options = {
+        tableName: "tb_unit_conversion",
+        timestamps: true,
+        createdAt: "create_time",
+        updatedAt: "update_time",
+    };
+
+    const UnitConversion = sequelize.define(
+        "UnitConversion",
+        attributes,
+        options
+    );
+
+    UnitConversion.associate = function (models) {
+        UnitConversion.belongsTo(models.Product, {
+            foreignKey: "fk_product_id",
+            as: "product",
+        });
+        UnitConversion.belongsTo(models.Unit, {
+            foreignKey: "base_unit_id",
+            as: "baseUnit",
+        });
+        UnitConversion.belongsTo(models.Unit, {
+            foreignKey: "conversion_unit_id",
+            as: "conversionUnit",
+        });
+    };
+
+    return UnitConversion;
 }
-
-module.exports = UnitConversion;

@@ -1,38 +1,49 @@
-"use strict";
+const { DataTypes } = require("sequelize");
 
-const Category = require("./category.model");
+module.exports = model;
 
-class Product {
-    constructor({
-        productId,
-        productName,
-        productDesc,
-        productStatus,
-        productAttrs,
-        productThumbnail,
-        sort,
-        isActive,
-        isDeleted,
-        productCategory,
-        productBrand,
-        createTime,
-        updateTime,
-    }) {
-        this.productId = productId;
-        this.productName = productName;
-        this.productDesc = productDesc;
-        this.productStatus = productStatus;
-        this.productAttrs = productAttrs;
-        this.productThumbnail = productThumbnail;
-        this.sort = sort;
-        this.isActive = isActive;
-        this.isDeleted = isDeleted;
-        this.productCategory =
-            productCategory instanceof Category ? productCategory : null;
-        this.productBrand = productBrand instanceof Brand ? productBrand : null;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
+function model(sequelize) {
+    const attributes = {
+        product_id: { type: DataTypes.STRING(100), primaryKey: true },
+        product_name: { type: DataTypes.STRING(100), allowNull: false },
+        product_desc: { type: DataTypes.TEXT, allowNull: false },
+        product_status: { type: DataTypes.TINYINT, allowNull: true },
+        product_attrs: { type: DataTypes.TEXT, allowNull: true },
+        thumbnail: { type: DataTypes.STRING(255), allowNull: false },
+        sort: { type: DataTypes.INTEGER, defaultValue: 0, allowNull: true },
+        is_active: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+            allowNull: false,
+        },
+        is_deleted: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            allowNull: false,
+        },
+        product_category_id: { type: DataTypes.BIGINT, allowNull: false },
+        product_brand_id: { type: DataTypes.BIGINT, allowNull: false },
+    };
+
+    const options = {
+        tableName: "sd_product",
+        timestamps: true,
+        createdAt: "create_time",
+        updatedAt: "update_time",
+    };
+
+    const Product = sequelize.define("Product", attributes, options);
+
+    Product.associate = function (models) {
+        Product.belongsTo(models.Brand, {
+            foreignKey: "product_brand_id",
+            as: "brand",
+        });
+        Product.belongsTo(models.Category, {
+            foreignKey: "product_category_id",
+            as: "category",
+        });
+    };
+
+    return Product;
 }
-
-module.exports = Product;

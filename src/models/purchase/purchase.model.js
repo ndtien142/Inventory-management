@@ -1,23 +1,32 @@
 "use strict";
 
-const Provider = require("./provider.model");
+const { DataTypes } = require("sequelize");
 
-class Purchase {
-    constructor({
-        id,
-        provider,
-        expectedArrivalDate,
-        status,
-        createTime,
-        updateTime,
-    }) {
-        this.id = id;
-        this.provider = provider instanceof Provider ? provider : null;
-        this.expectedArrivalDate = expectedArrivalDate;
-        this.status = status; // Enum: "pending", "processing", "shipped", "delivered"
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
+module.exports = model;
+
+function model(sequelize) {
+    const attributes = {
+        id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
+        fk_provider_id: { type: DataTypes.BIGINT, allowNull: false },
+        expected_arrival_date: { type: DataTypes.DATE, allowNull: false },
+        status: { type: DataTypes.TINYINT, allowNull: false },
+    };
+
+    const options = {
+        tableName: "tb_purchase",
+        timestamps: true,
+        createdAt: "create_time",
+        updatedAt: "update_time",
+    };
+
+    const Purchase = sequelize.define("Purchase", attributes, options);
+
+    Purchase.associate = function (models) {
+        Purchase.belongsTo(models.Provider, {
+            foreignKey: "fk_provider_id",
+            as: "provider",
+        });
+    };
+
+    return Purchase;
 }
-
-module.exports = Purchase;

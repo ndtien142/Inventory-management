@@ -7,35 +7,30 @@ module.exports = model;
 function model(sequelize) {
     const attributes = {
         id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
-        fk_purchase_id: { type: DataTypes.BIGINT, allowNull: false },
         fk_sku_no: { type: DataTypes.STRING(100), allowNull: false },
+        fk_cart_id: { type: DataTypes.BIGINT, allowNull: false },
         quantity: { type: DataTypes.BIGINT, allowNull: false },
-        unit_price: { type: DataTypes.DECIMAL(18, 2), allowNull: false },
     };
 
     const options = {
-        tableName: "detail_purchase",
+        tableName: "cart_line_item",
         timestamps: true,
         createdAt: "create_time",
         updatedAt: "update_time",
     };
 
-    const DetailPurchase = sequelize.define(
-        "DetailPurchase",
-        attributes,
-        options
-    );
+    const CartLineItem = sequelize.define("CartLineItem", attributes, options);
 
-    DetailPurchase.associate = function (models) {
-        DetailPurchase.belongsTo(models.Purchase, {
-            foreignKey: "fk_purchase_id",
-            as: "purchase",
+    CartLineItem.associate = function (models) {
+        CartLineItem.belongsTo(models.Cart, {
+            foreignKey: "fk_cart_id",
+            as: "cart",
         });
-        DetailPurchase.belongsTo(models.SKU, {
+        CartLineItem.belongsTo(models.SKU, {
             foreignKey: "fk_sku_no",
             as: "sku",
         });
     };
 
-    return DetailPurchase;
+    return CartLineItem;
 }
