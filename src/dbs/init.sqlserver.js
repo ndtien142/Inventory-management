@@ -1,37 +1,63 @@
 "use strict";
 
-const Connection = require("tedious").Connection;
-const {
-    db: { host, user, password, port, database },
-} = require("../config/config.sqlserver");
+const tedious = require("tedious");
+const { Sequelize } = require("sequelize");
 
-const config = {
-    server: `${host}`,
-    authentication: {
-        type: "default",
-        options: {
-            userName: user,
-            password: password,
-        },
-    },
-    options: {
-        // If you are on Microsoft Azure, you need encryption:
-        database: database,
-        encrypt: true,
-        trustServerCertificate: true, // Trust the self-signed certificate
-        connectTimeout: 15000,
-        requestTimeout: 15000,
-        port: 1433,
-    },
-};
+const dbConfig = require("../config/config.sqlserver");
 
-const connection = new Connection(config);
-connection.on("connect", function (err) {
-    if (err) {
-        console.log("Error: ", err);
-    } else {
-        console.log("Connected to SQL Server Successfully");
-    }
-});
+const db = {};
 
-connection.connect();
+initialize();
+
+async function initialize() {
+    const dialect = "mssql";
+    const host = dbConfig.server;
+    const { userName, password } = dbConfig.authentication.options;
+
+    // create db if it doesn't already exist
+    await ensureDbExists(dbConfig.options.database);
+
+    // connect to db
+    const sequelize = new Sequelize(
+        dbConfig.options.database,
+        userName,
+        password,
+        {
+            host,
+            dialect,
+        }
+    );
+
+    // init models and add them to the exported db object
+    // db.User = require("../models/test/user.model")(sequelize);
+
+    // sync all models with database
+    await sequelize.sync({ alter: true });
+}
+
+async function ensureDbExists(dbName) {
+    return new Promise((resolve, reject) => {
+        const connection = new tedious.Connection(dbConfig);
+        connection.connect((err) => {
+            if (err) {
+                console.error(err);
+                reject(`Connection Failed: ${err.message}`);
+            }
+
+            const createDbQuery = `IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = '${dbName}') CREATE DATABASE [${dbName}];`;
+            const request = new tedious.Request(createDbQuery, (err) => {
+                if (err) {
+                    console.error(err);
+                    reject(`Create DB Query Failed: ${err.message}`);
+                }
+
+                // query executed successfully
+                resolve();
+            });
+
+            connection.execSql(request);
+        });
+    });
+}
+
+module.exports = db;

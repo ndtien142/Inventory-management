@@ -1,25 +1,22 @@
 "use strict";
 
-const dev = {
-    db: {
-        host: process.env.DEV_DB_SERVER_NAME || `DESKTOP-LDUQE6I`,
-        user: process.env.DEV_DB_USER || "sa",
-        password: process.env.DEV_DB_PASSWORD || "Xeucutevkim123",
-        port: process.env.DEV_DB_PORT || 1433,
-        database: process.env.DEV_DB_DATABASE || "inventory_management",
+require("dotenv").config();
+
+const dbConfig = {
+    server: process.env.DB_SERVER,
+    options: {
+        port: parseInt(process.env.DB_PORT, 10),
+        trustServerCertificate:
+            process.env.DB_TRUST_SERVER_CERTIFICATE === "true",
+        database: process.env.DB_NAME,
+    },
+    authentication: {
+        type: "default",
+        options: {
+            userName: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+        },
     },
 };
 
-const pro = {
-    db: {
-        host: process.env.PRO_DB_SERVER_NAME || `DESKTOP-LDUQE6I`,
-        user: process.env.PRO_DB_USER || "sa",
-        password: process.env.PRO_DB_PASSWORD || "Xeucutevkim123",
-        port: process.env.PRO_DB_PORT || 1433,
-        database: process.env.PRO_DB_DATABASE || "inventory_management",
-    },
-};
-
-const config = { dev, pro };
-const env = process.env.NODE_ENV || "dev";
-module.exports = config[env];
+module.exports = dbConfig;
