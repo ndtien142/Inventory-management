@@ -1,11 +1,32 @@
-const POST_STATUS = Object.freeze({
-    PUBLISH: "PUBLISH",
-    UNPUBLISH: "UNPUBLISH",
-    DRAFT: "DRAFT",
-    ARCHIVE: "ARCHIVE",
-    TRASH: "TRASH",
+const PRODUCT_STATUS = Object.freeze({
+    1: "Available",
+    2: "Out of stock",
+});
+
+const PAYMENT_TRANSACTION_STATUS = Object.freeze({
+    SUCCESS: "success",
+    FAILED: "failed",
+});
+
+const ORDER_STATUS = Object.freeze({
+    PENDING: "pending",
+    PROCESSING: "processing",
+    SHIPPED: "shipped",
+    DELIVERED: "delivered",
+    CANCELLED: "cancelled",
+});
+
+const PURCHASE_STATUS = Object.freeze({
+    PENDING: "pending",
+    PROCESSING: "processing",
+    SHIPPED: "shipped",
+    DELIVERED: "delivered",
+    CANCELLED: "cancelled",
 });
 
 module.exports = {
-    POST_STATUS,
+    ORDER_STATUS,
+    PURCHASE_STATUS,
+    PAYMENT_TRANSACTION_STATUS,
+    PRODUCT_STATUS,
 };

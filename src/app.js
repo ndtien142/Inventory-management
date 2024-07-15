@@ -42,8 +42,7 @@ app.use(
     })
 );
 
-// init db
-require("./dbs/init.mongodb");
+// init database
 require("./dbs/init.sqlserver");
 
 app.use("/v1/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

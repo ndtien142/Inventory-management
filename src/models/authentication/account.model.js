@@ -1,46 +1,27 @@
 "use strict";
 
-const { model, Schema } = require("mongoose"); // Erase if already required
+const Role = require("./role.model");
 
-const DOCUMENT_NAME = "Account";
-const COLLECTION_NAME = "Accounts";
-
-// Declare the Schema of the Mongo model
-var accountSchema = new Schema(
-    {
-        name: {
-            type: String,
-            trim: true,
-            maxLength: 150,
-        },
-        email: {
-            type: String,
-            required: true,
-            unique: true,
-        },
-        password: {
-            type: String,
-            required: true,
-        },
-        status: {
-            type: String,
-            enum: ["active", "inactive"],
-            default: "inactive",
-        },
-        verify: {
-            type: Schema.Types.Boolean,
-            default: false,
-        },
-        roles: {
-            type: Array,
-            default: [],
-        },
-    },
-    {
-        timestamps: true,
-        collection: COLLECTION_NAME,
+class Account {
+    constructor({
+        userCode,
+        username,
+        password,
+        isActive,
+        isBlock,
+        role,
+        createTime,
+        updateTime,
+    }) {
+        this.customerId = userCode;
+        this.customerName = username;
+        this.customerAddress = password;
+        this.isActive = isActive;
+        this.isBlock = isBlock;
+        this.role = role instanceof Role ? role : new Role();
+        this.createTime = createTime;
+        this.updateTime = updateTime;
     }
-);
+}
 
-//Export the model
-module.exports = model(DOCUMENT_NAME, accountSchema);
+module.exports = Account;
