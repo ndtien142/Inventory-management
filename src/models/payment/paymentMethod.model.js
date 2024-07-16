@@ -15,7 +15,7 @@ function model(sequelize) {
         description: { type: DataTypes.STRING(255), allowNull: true },
         is_active: {
             type: DataTypes.BOOLEAN,
-            defaultValue: 1,
+            // defaultValue: true,
         },
     };
 

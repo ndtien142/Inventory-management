@@ -15,12 +15,12 @@ function model(sequelize) {
         sku_image: { type: DataTypes.STRING(255), allowNull: false },
         is_default: {
             type: DataTypes.TINYINT,
-            defaultValue: 0,
+            // defaultValue: 0,
             allowNull: true,
         },
         is_deleted: {
             type: DataTypes.BOOLEAN,
-            defaultValue: false,
+            // defaultValue: false,
             allowNull: true,
         },
         fk_unit_id: { type: DataTypes.BIGINT, allowNull: false },

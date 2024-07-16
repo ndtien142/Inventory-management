@@ -13,7 +13,7 @@ function model(sequelize) {
         phone_number: {
             type: DataTypes.STRING(20),
             allowNull: false,
-            unique: true,
+            // unique: true,
         },
         address: { type: DataTypes.TEXT, allowNull: false },
     };

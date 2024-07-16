@@ -14,7 +14,7 @@ function model(sequelize) {
         username: {
             type: DataTypes.STRING(255),
             allowNull: false,
-            unique: true,
+            // unique: true,
         },
         password: { type: DataTypes.STRING(255), allowNull: false },
         fk_role_id: {

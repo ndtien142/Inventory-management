@@ -10,7 +10,7 @@ function model(sequelize) {
         rate_conversion: { type: DataTypes.FLOAT, allowNull: false },
         is_deleted: {
             type: DataTypes.BOOLEAN,
-            defaultValue: false,
+            // defaultValue: false,
             allowNull: true,
         },
         fk_product_id: { type: DataTypes.STRING(100), allowNull: true },

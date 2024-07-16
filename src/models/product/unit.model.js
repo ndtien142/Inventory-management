@@ -12,7 +12,11 @@ function model(sequelize) {
             primaryKey: true,
             allowNull: false,
         },
-        name: { type: DataTypes.STRING(255), allowNull: false, unique: true },
+        name: {
+            type: DataTypes.STRING(255),
+            allowNull: false,
+            // unique: true
+        },
     };
 
     const options = {

@@ -15,12 +15,12 @@ function model(sequelize) {
         role_name: {
             type: DataTypes.STRING(255),
             allowNull: false,
-            unique: true,
+            // unique: true,
         },
         role_description: { type: DataTypes.TEXT, allowNull: false },
         is_active: {
             type: DataTypes.BOOLEAN,
-            defaultValue: true,
+            // defaultValue: true,
             allowNull: false,
         },
     };

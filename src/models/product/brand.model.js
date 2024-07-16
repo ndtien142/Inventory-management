@@ -15,7 +15,7 @@ function model(sequelize) {
         brand_name: {
             type: DataTypes.STRING(255),
             allowNull: false,
-            unique: true,
+            // unique: true,
         },
         brand_description: { type: DataTypes.TEXT, allowNull: true },
     };

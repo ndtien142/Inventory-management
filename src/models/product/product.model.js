@@ -10,15 +10,19 @@ function model(sequelize) {
         product_status: { type: DataTypes.TINYINT, allowNull: true },
         product_attrs: { type: DataTypes.TEXT, allowNull: true },
         thumbnail: { type: DataTypes.STRING(255), allowNull: false },
-        sort: { type: DataTypes.INTEGER, defaultValue: 0, allowNull: true },
+        sort: {
+            type: DataTypes.INTEGER,
+            // defaultValue: 0,
+            allowNull: true,
+        },
         is_active: {
             type: DataTypes.BOOLEAN,
-            defaultValue: true,
+            // defaultValue: true,
             allowNull: false,
         },
         is_deleted: {
             type: DataTypes.BOOLEAN,
-            defaultValue: false,
+            // defaultValue: false,
             allowNull: false,
         },
         product_category_id: { type: DataTypes.BIGINT, allowNull: false },

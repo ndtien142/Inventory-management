@@ -185,7 +185,7 @@ async function initialize() {
         foreignKey: "fk_sku_no",
     });
     // sync all models with database
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ alter: true });
 }
 
 async function ensureDbExists(dbName) {

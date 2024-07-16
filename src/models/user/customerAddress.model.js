@@ -16,7 +16,7 @@ function model(sequelize) {
         country: { type: DataTypes.STRING(100), allowNull: false },
         is_deleted: {
             type: DataTypes.BOOLEAN,
-            defaultValue: false,
+            // defaultValue: false,
             allowNull: true,
         },
     };

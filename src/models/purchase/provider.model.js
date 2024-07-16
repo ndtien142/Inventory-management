@@ -12,11 +12,15 @@ function model(sequelize) {
             primaryKey: true,
             allowNull: false,
         },
-        name: { type: DataTypes.STRING(1000), allowNull: false, unique: true },
+        name: {
+            type: DataTypes.STRING(1000),
+            allowNull: false,
+            // unique: true
+        },
         contact_infor: { type: DataTypes.TEXT, allowNull: false },
         is_active: {
             type: DataTypes.BOOLEAN,
-            defaultValue: true,
+            // defaultValue: true,
             allowNull: false,
         },
     };

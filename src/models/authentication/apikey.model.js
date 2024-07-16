@@ -9,11 +9,11 @@ function model(sequelize) {
         key: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true,
+            // unique: true,
         },
         status: {
             type: DataTypes.BOOLEAN,
-            defaultValue: true,
+            // defaultValue: true,
         },
         is_block: { type: DataTypes.BOOLEAN, allowNull: false },
     };
