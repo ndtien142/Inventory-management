@@ -21,18 +21,11 @@ function model(sequelize) {
     const options = {
         tableName: "tb_profile",
         timestamps: true,
-        createdAt: "created_at",
-        updatedAt: "updated_at",
+        createdAt: "created_time",
+        updatedAt: "updated_time",
     };
 
     const Profile = sequelize.define("Profile", attributes, options);
-
-    Profile.associate = function (models) {
-        Profile.belongsTo(models.Account, {
-            foreignKey: "fk_user_code",
-            as: "user",
-        });
-    };
 
     return Profile;
 }

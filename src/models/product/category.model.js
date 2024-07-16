@@ -19,12 +19,5 @@ function model(sequelize) {
 
     const Category = sequelize.define("Category", attributes, options);
 
-    Category.associate = function (models) {
-        Category.belongsTo(models.Category, {
-            foreignKey: "parent_category_id",
-            as: "parentCategory",
-        });
-    };
-
     return Category;
 }

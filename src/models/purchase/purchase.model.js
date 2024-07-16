@@ -21,12 +21,5 @@ function model(sequelize) {
 
     const Purchase = sequelize.define("Purchase", attributes, options);
 
-    Purchase.associate = function (models) {
-        Purchase.belongsTo(models.Provider, {
-            foreignKey: "fk_provider_id",
-            as: "provider",
-        });
-    };
-
     return Purchase;
 }

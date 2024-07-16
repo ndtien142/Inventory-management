@@ -35,12 +35,5 @@ function model(sequelize) {
 
     const Account = sequelize.define("Account", attributes, options);
 
-    Account.associate = function (models) {
-        Account.belongsTo(models.Role, {
-            foreignKey: "fk_role_id",
-            as: "role",
-        });
-    };
-
     return Account;
 }

@@ -34,12 +34,5 @@ function model(sequelize) {
         options
     );
 
-    CustomerAddress.associate = function (models) {
-        CustomerAddress.belongsTo(models.Account, {
-            foreignKey: "fk_user_code",
-            as: "user",
-        });
-    };
-
     return CustomerAddress;
 }

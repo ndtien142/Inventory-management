@@ -25,20 +25,5 @@ function model(sequelize) {
 
     const Order = sequelize.define("Order", attributes, options);
 
-    Order.associate = function (models) {
-        Order.belongsTo(models.CustomerAddress, {
-            foreignKey: "fk_address_id",
-            as: "address",
-        });
-        Order.belongsTo(models.PaymentMethod, {
-            foreignKey: "fk_payment_method_id",
-            as: "paymentMethod",
-        });
-        Order.belongsTo(models.Account, {
-            foreignKey: "fk_user_code",
-            as: "user",
-        });
-    };
-
     return Order;
 }

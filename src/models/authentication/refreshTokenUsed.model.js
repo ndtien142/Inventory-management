@@ -6,26 +6,25 @@ module.exports = model;
 
 function model(sequelize) {
     const attributes = {
-        key: {
+        token: {
             type: DataTypes.STRING,
             allowNull: false,
             unique: true,
         },
-        status: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: true,
-        },
-        is_block: { type: DataTypes.BOOLEAN, allowNull: false },
     };
 
     const options = {
-        tableName: "tb_api_key",
-        timestamps: true,
+        tableName: "tb_refresh_token_used",
+        timestamps: false,
         createdAt: "create_time",
         updatedAt: "update_time",
     };
 
-    const ApiKeys = sequelize.define("ApiKeys", attributes, options);
+    const RefreshTokenUsed = sequelize.define(
+        "RefreshTokenUsed",
+        attributes,
+        options
+    );
 
-    return ApiKeys;
+    return RefreshTokenUsed;
 }

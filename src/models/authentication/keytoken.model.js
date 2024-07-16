@@ -1,41 +1,37 @@
 "use strict";
 
-const { Schema, model } = require("mongoose"); // Erase if already required
+const { DataTypes } = require("sequelize");
 
-const DOCUMENT_NAME = "Key";
-const COLLECTION_NAME = "Keys";
+module.exports = model;
 
-// Declare the Schema of the Mongo model
-const keyTokenSchema = new Schema(
-    {
-        user: {
-            type: Schema.Types.ObjectId,
-            required: true,
-            ref: "Account",
+function model(sequelize) {
+    const attributes = {
+        fk_user_code: {
+            type: DataTypes.STRING(20),
+            allowNull: false,
         },
         privateKey: {
-            type: String,
-            required: true,
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         publicKey: {
-            type: String,
-            required: true,
-        },
-        // save refresh token used to
-        refreshTokensUsed: {
-            type: Array,
-            default: [],
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         refreshToken: {
-            type: String,
-            required: true,
+            type: DataTypes.STRING,
+            allowNull: false,
         },
-    },
-    {
-        timestamps: true,
-        collectionName: COLLECTION_NAME,
-    }
-);
+    };
 
-//Export the model
-module.exports = model(DOCUMENT_NAME, keyTokenSchema);
+    const options = {
+        tableName: "tb_api_key",
+        timestamps: true,
+        createdAt: "create_time",
+        updatedAt: "update_time",
+    };
+
+    const KeyToken = sequelize.define("KeyToken", attributes, options);
+
+    return KeyToken;
+}

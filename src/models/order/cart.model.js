@@ -20,12 +20,5 @@ function model(sequelize) {
 
     const Cart = sequelize.define("Cart", attributes, options);
 
-    Cart.associate = function (models) {
-        Cart.belongsTo(models.Account, {
-            foreignKey: "fk_user_code",
-            as: "user",
-        });
-    };
-
     return Cart;
 }

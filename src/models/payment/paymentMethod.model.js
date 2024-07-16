@@ -10,14 +10,12 @@ function model(sequelize) {
             type: DataTypes.BIGINT,
             autoIncrement: true,
             primaryKey: true,
-            allowNull: false,
         },
         name: { type: DataTypes.STRING(100), allowNull: false },
         description: { type: DataTypes.STRING(255), allowNull: true },
         is_active: {
             type: DataTypes.BOOLEAN,
             defaultValue: 1,
-            allowNull: false,
         },
     };
 

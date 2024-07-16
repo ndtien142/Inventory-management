@@ -6,9 +6,6 @@ module.exports = model;
 
 function model(sequelize) {
     const attributes = {
-        id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
-        fk_purchase_id: { type: DataTypes.BIGINT, allowNull: false },
-        fk_sku_no: { type: DataTypes.STRING(100), allowNull: false },
         quantity: { type: DataTypes.BIGINT, allowNull: false },
         unit_price: { type: DataTypes.DECIMAL(18, 2), allowNull: false },
     };
@@ -25,17 +22,6 @@ function model(sequelize) {
         attributes,
         options
     );
-
-    DetailPurchase.associate = function (models) {
-        DetailPurchase.belongsTo(models.Purchase, {
-            foreignKey: "fk_purchase_id",
-            as: "purchase",
-        });
-        DetailPurchase.belongsTo(models.SKU, {
-            foreignKey: "fk_sku_no",
-            as: "sku",
-        });
-    };
 
     return DetailPurchase;
 }

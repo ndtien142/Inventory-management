@@ -4,8 +4,12 @@ module.exports = model;
 
 function model(sequelize) {
     const attributes = {
-        sku_no: { type: DataTypes.STRING(100), primaryKey: true },
-        fk_product_id: { type: DataTypes.STRING(100), primaryKey: true },
+        sku_no: {
+            type: DataTypes.STRING(100),
+            primaryKey: true,
+            allowNull: false,
+        },
+        fk_product_id: { type: DataTypes.STRING(100) },
         sku_name: { type: DataTypes.STRING(500), allowNull: false },
         sku_description: { type: DataTypes.TEXT, allowNull: false },
         sku_image: { type: DataTypes.STRING(255), allowNull: false },
@@ -32,17 +36,6 @@ function model(sequelize) {
     };
 
     const SKU = sequelize.define("SKU", attributes, options);
-
-    SKU.associate = function (models) {
-        SKU.belongsTo(models.Product, {
-            foreignKey: "fk_product_id",
-            as: "product",
-        });
-        SKU.belongsTo(models.Unit, {
-            foreignKey: "fk_unit_id",
-            as: "unit",
-        });
-    };
 
     return SKU;
 }

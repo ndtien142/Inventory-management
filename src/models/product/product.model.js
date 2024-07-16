@@ -34,16 +34,5 @@ function model(sequelize) {
 
     const Product = sequelize.define("Product", attributes, options);
 
-    Product.associate = function (models) {
-        Product.belongsTo(models.Brand, {
-            foreignKey: "product_brand_id",
-            as: "brand",
-        });
-        Product.belongsTo(models.Category, {
-            foreignKey: "product_category_id",
-            as: "category",
-        });
-    };
-
     return Product;
 }

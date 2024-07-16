@@ -29,20 +29,5 @@ function model(sequelize) {
         options
     );
 
-    UnitConversion.associate = function (models) {
-        UnitConversion.belongsTo(models.Product, {
-            foreignKey: "fk_product_id",
-            as: "product",
-        });
-        UnitConversion.belongsTo(models.Unit, {
-            foreignKey: "base_unit_id",
-            as: "baseUnit",
-        });
-        UnitConversion.belongsTo(models.Unit, {
-            foreignKey: "conversion_unit_id",
-            as: "conversionUnit",
-        });
-    };
-
     return UnitConversion;
 }

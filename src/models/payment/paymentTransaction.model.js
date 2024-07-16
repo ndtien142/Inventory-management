@@ -30,16 +30,5 @@ function model(sequelize) {
         options
     );
 
-    PaymentTransactions.associate = function (models) {
-        PaymentTransactions.belongsTo(models.Order, {
-            foreignKey: "fk_order_id",
-            as: "order",
-        });
-        PaymentTransactions.belongsTo(models.PaymentMethod, {
-            foreignKey: "fk_payment_method_id",
-            as: "paymentMethod",
-        });
-    };
-
     return PaymentTransactions;
 }
