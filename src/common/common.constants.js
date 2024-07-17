@@ -1,3 +1,10 @@
+const ROLE = Object.freeze({
+    ADMIN: "admin",
+    USER: "user",
+    MANAGER: "manager",
+    CUSTOMER: "customer",
+});
+
 const PRODUCT_STATUS = Object.freeze({
     1: "Available",
     2: "Out of stock",
@@ -29,4 +36,5 @@ module.exports = {
     PURCHASE_STATUS,
     PAYMENT_TRANSACTION_STATUS,
     PRODUCT_STATUS,
+    ROLE,
 };

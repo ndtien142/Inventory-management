@@ -15,6 +15,10 @@ function model(sequelize) {
             type: DataTypes.BOOLEAN,
             // defaultValue: true,
         },
+        permission: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         is_block: { type: DataTypes.BOOLEAN, allowNull: false },
     };
 

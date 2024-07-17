@@ -1,11 +1,9 @@
-"use strict";
-
 const tedious = require("tedious");
 const { Sequelize } = require("sequelize");
 
 const dbConfig = require("../config/config.sqlserver");
 
-const db = {};
+module.exports = db = {};
 
 initialize();
 
@@ -212,5 +210,3 @@ async function ensureDbExists(dbName) {
         });
     });
 }
-
-module.exports = db;

@@ -9,6 +9,7 @@ const router = express.Router();
 // check permissions
 // router.use(permission("0000"));
 
+router.use("/admin/role", require("./role"));
 router.use("", require("./access"));
 
 module.exports = router;

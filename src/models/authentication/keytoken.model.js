@@ -25,7 +25,7 @@ function model(sequelize) {
     };
 
     const options = {
-        tableName: "tb_api_key",
+        tableName: "tb_key_token",
         timestamps: true,
         createdAt: "create_time",
         updatedAt: "update_time",

@@ -1,10 +1,29 @@
 const _ = require("lodash");
 const { Types } = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
+
+const generateUserCode = () => {
+    return uuidv4().replace(/-/g, "").slice(0, 20);
+};
 
 const convertToObjectIdMongodb = (id) => new Types.ObjectId(id);
 
+const toCamelCase = (key) => {
+    const withoutPrefix = key.replace(/^fk_/, "");
+    return withoutPrefix.replace(/_([a-z])/g, (match, letter) =>
+        letter.toUpperCase()
+    );
+};
+
 const getInfoData = ({ fields = [], object = {} }) => {
-    return _.pick(object, fields);
+    const pickedData = _.pick(object, fields);
+
+    const transformedData = {};
+    Object.keys(pickedData).forEach((key) => {
+        transformedData[toCamelCase(key)] = pickedData[key];
+    });
+
+    return transformedData;
 };
 
 // convert ['a', 'b'] => {a: 1, b: 1}
@@ -67,4 +86,5 @@ module.exports = {
     removeUndefinedObject,
     updateNestedObject,
     convertToObjectIdMongodb,
+    generateUserCode,
 };
