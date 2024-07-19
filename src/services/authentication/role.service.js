@@ -1,5 +1,12 @@
 const { BadRequestError, NotFoundError } = require("../../core/error.response");
-const db = require("../../dbs/init.sqlserver");
+const {
+    getRoleByName,
+    getRoleById,
+    getAllRoles,
+    updateRole,
+    deleteRole,
+    createRole,
+} = require("../../models/repositories/role.repo");
 const { getInfoData } = require("../../utils");
 
 class RoleService {
@@ -8,14 +15,12 @@ class RoleService {
         roleDescription,
         isActive = true,
     }) => {
-        const findRole = await db.Role.findOne({
-            where: { role_name: roleName },
-        });
+        const findRole = await getRoleByName(roleName);
         if (findRole) throw new BadRequestError("Role already exists!");
-        const result = await db.Role.create({
-            role_name: roleName,
-            role_description: roleDescription,
-            is_active: isActive,
+        const result = await createRole({
+            roleDescription,
+            roleName,
+            isActive,
         });
         return {
             id: result.id,
@@ -27,7 +32,7 @@ class RoleService {
         };
     };
     static getRoleById = async (id) => {
-        const result = await db.Role.findByPk(parseInt(id));
+        const result = await getRoleById(id);
         if (!result) throw new NotFoundError("Role not found");
         return getInfoData({
             fields: [
@@ -42,7 +47,7 @@ class RoleService {
         });
     };
     static getAllRoles = async () => {
-        const result = await db.Role.findAll();
+        const result = getAllRoles();
         if (!result) throw new NotFoundError("Role not found");
         return result.map((item) =>
             getInfoData({
@@ -58,11 +63,18 @@ class RoleService {
             })
         );
     };
-    static updateRole = async ({ id, roleName, roleDescription }) => {
-        const result = await db.Role.update(
-            { role_name: roleName, role_description: roleDescription },
-            { where: { id: id } }
-        );
+    static updateRole = async ({
+        id,
+        roleName,
+        roleDescription,
+        isActive = true,
+    }) => {
+        const result = await updateRole({
+            id,
+            roleName,
+            roleDescription,
+            isActive,
+        });
         return getInfoData({
             fields: [
                 "id",
@@ -76,7 +88,7 @@ class RoleService {
         });
     };
     static deleteRole = async (id) => {
-        const result = await db.Role.destroy({ where: { id: id } });
+        const result = await deleteRole(id);
         return getInfoData({
             fields: [
                 "id",
@@ -90,7 +102,7 @@ class RoleService {
         });
     };
     static getRoleByName = async (roleName) => {
-        const result = db.Role.findOne({ where: { role_name: roleName } });
+        const result = await getRoleByName(roleName);
         if (!result) throw new NotFoundError("Role not found");
         return getInfoData({
             fields: [

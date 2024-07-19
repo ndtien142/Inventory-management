@@ -7,7 +7,7 @@ module.exports = model;
 function model(sequelize) {
     const attributes = {
         token: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
             // unique: true,
         },
