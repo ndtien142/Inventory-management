@@ -17,6 +17,67 @@ const {
 const { createKeyToken } = require("../../models/repositories/keyToken.repo");
 
 class AccessService {
+    static logout = async ({ keyStore }) => {
+        const delKeyStore = await KeyTokenService.removeKeyById(keyStore._id);
+        return delKeyStore;
+    };
+    /*
+        1 - Check email in database
+        2 - match password
+        3 - create access token and refresh token and save
+        4 - generate tokens
+        5 - get data return login
+    */
+    static login = async ({ username, password, refreshToken = null }) => {
+        // 1
+        const foundAccount = await db.Account.findOne({ where: { username } });
+        if (!foundAccount) throw new BadRequestError("Username not registered");
+
+        // 2
+        const matchPassword = await bcrypt.compare(
+            password,
+            foundAccount.password
+        );
+        if (!matchPassword) throw new AuthFailureError("Authentication Error");
+
+        // 3
+        const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
+            modulusLength: 4096,
+            publicKeyEncoding: {
+                // public key cryptographic standard
+                type: "pkcs1",
+                format: "pem",
+            },
+            privateKeyEncoding: {
+                // public key cryptographic standard
+                type: "pkcs1",
+                format: "pem",
+            },
+        });
+
+        // 4
+        const tokens = await createTokenPair(
+            { userCode: foundAccount.user_code, username },
+            publicKey,
+            privateKey
+        );
+        createKeyToken({
+            useCode: foundAccount.user_code,
+            refreshToken: tokens.refreshToken,
+            privateKey,
+            publicKey,
+        });
+
+        return {
+            code: 200,
+            tokens,
+            user: {
+                userCode: foundAccount.user_code,
+                username: foundAccount.username,
+            },
+        };
+    };
+
     static signUp = async ({ username, password, roleName }) => {
         // step 1: check username exist
         const existingAccount = await getAccountByUsername(username);
