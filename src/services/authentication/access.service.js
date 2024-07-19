@@ -14,11 +14,14 @@ const {
     createAccount,
     getAccountByUsername,
 } = require("../../models/repositories/account.repo");
-const { createKeyToken } = require("../../models/repositories/keyToken.repo");
+const {
+    createKeyToken,
+    removeKeyTokenByUserCode,
+} = require("../../models/repositories/keyToken.repo");
 
 class AccessService {
-    static logout = async ({ keyStore }) => {
-        const delKeyStore = await KeyTokenService.removeKeyById(keyStore._id);
+    static logout = async ({ userCode }) => {
+        const delKeyStore = await removeKeyTokenByUserCode(userCode);
         return delKeyStore;
     };
     /*
