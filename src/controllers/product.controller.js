@@ -10,6 +10,14 @@ class ProductController {
             metadata: await ProductService.createProduct({ ...req.body }),
         }).send(res);
     };
+    getDetailProduct = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Get Product Detail Successfully",
+            metadata: await ProductService.getProductDetails(
+                req.params.productId
+            ),
+        }).send(res);
+    };
 }
 
 module.exports = new ProductController();

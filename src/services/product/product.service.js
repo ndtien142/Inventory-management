@@ -98,13 +98,10 @@ class ProductService {
             );
         }
         const transaction = await db.sequelize.transaction();
-        console.log("transaction", transaction);
 
         try {
             const slug = slugify(productName, { lower: true, strict: true });
-            const productId = slug; // Sử dụng slug làm productId
-
-            // Tạo product
+            const productId = slug;
             const product = await db.Product.create(
                 {
                     product_id: productId,
@@ -122,7 +119,6 @@ class ProductService {
                 { transaction }
             );
 
-            // Kiểm tra và tạo unit nếu cần
             const units = {};
             for (const unit of unitConversion) {
                 if (!units[unit.baseUnit.id]) {
@@ -139,8 +135,6 @@ class ProductService {
                         transaction,
                     }).then(([unit]) => unit);
                 }
-                console.log("tao conversion");
-                // Tạo UnitConversion
                 await db.UnitConversion.create(
                     {
                         base_unit_id: unit.baseUnit.id,
@@ -152,11 +146,9 @@ class ProductService {
                     { transaction }
                 );
             }
-            console.log("Created SKU");
             for (const item of sku) {
                 const skuNo = `${product.product_id}-${slugify(item.skuName, { lower: true, strict: true })}`;
 
-                // Kiểm tra và tạo unit cho SKU nếu cần
                 if (!units[item.unit.id]) {
                     units[item.unit.id] = await db.Unit.findOrCreate({
                         where: { id: item.unit.id },
@@ -196,9 +188,103 @@ class ProductService {
         // fetch all products from database
         // return products
     };
-    static getProductById = async (productId) => {
-        // fetch product by id from database
-        // return product
+    static getProductDetails = async (productId) => {
+        try {
+            const product = await db.Product.findOne({
+                where: { product_id: productId },
+                include: [
+                    {
+                        model: db.Brand,
+                        as: "brand",
+                        attributes: ["id", "brand_name"],
+                    },
+                    {
+                        model: db.Category,
+                        as: "category",
+                        attributes: ["id", "name"],
+                    },
+                    {
+                        model: db.UnitConversion,
+                        as: "unitConversion",
+                        include: [
+                            {
+                                model: db.Unit,
+                                as: "baseUnit",
+                                attributes: ["id", "name"],
+                            },
+                            {
+                                model: db.Unit,
+                                as: "conversionUnit",
+                                attributes: ["id", "name"],
+                            },
+                        ],
+                    },
+                    {
+                        model: db.SKU,
+                        as: "sku",
+                        include: [
+                            {
+                                model: db.Unit,
+                                as: "unit",
+                                attributes: ["id", "name"],
+                            },
+                        ],
+                    },
+                ],
+            });
+
+            if (!product) {
+                throw new Error("Product not found");
+            }
+
+            return {
+                productId: product.product_id,
+                productName: product.product_name,
+                productDesc: product.product_desc,
+                productStatus:
+                    product.product_status === 1 ? "available" : "unavailable",
+                productAttrs: JSON.parse(product.product_attrs),
+                thumbnail: product.thumbnail,
+                sort: product.sort,
+                isActive: product.is_active,
+                isDeleted: product.is_deleted,
+                brand: {
+                    id: product.brand.id,
+                    name: product.brand.brand_name,
+                },
+                category: {
+                    id: product.category.id,
+                    name: product.category.name,
+                },
+                unitConversion: product.unitConversion.map((uc) => ({
+                    baseUnit: {
+                        id: uc.baseUnit.id,
+                        name: uc.baseUnit.name,
+                    },
+                    conversionUnit: {
+                        id: uc.conversionUnit.id,
+                        name: uc.conversionUnit.name,
+                    },
+                    rateConversion: uc.rate_conversion,
+                })),
+                sku: product.sku.map((sku) => ({
+                    skuNo: sku.sku_no,
+                    skuName: sku.sku_name,
+                    skuDescription: sku.sku_description,
+                    skuImage: sku.sku_image,
+                    isDefault: sku.is_default,
+                    isDeleted: sku.is_deleted,
+                    price: sku.price,
+                    unit: {
+                        id: sku.unit.id,
+                        name: sku.unit.name,
+                    },
+                    stock: sku.stock,
+                })),
+            };
+        } catch (error) {
+            throw new Error(`Failed to get product details: ${error.message}`);
+        }
     };
     static updateProduct = async (productId, {}) => {
         // update product in database by id
