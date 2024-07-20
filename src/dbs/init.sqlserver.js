@@ -118,11 +118,15 @@ async function initialize() {
 
     // ========= One - Many =========
     // KeyToken - RefreshTokenUsed
-    db.KeyToken.hasMany(db.RefreshTokenUsed, { foreignKey: "fk_api_key_id" });
+    db.KeyToken.hasMany(db.RefreshTokenUsed, {
+        as: "refreshTokenUsed",
+        foreignKey: "fk_api_key_id",
+    });
     db.RefreshTokenUsed.belongsTo(db.KeyToken, { foreignKey: "fk_api_key_id" });
 
     // Account - Address
     db.Account.hasMany(db.CustomerAddress, {
+        as: "address",
         foreignKey: "fk_user_code",
     });
     db.CustomerAddress.belongsTo(db.Account, {
@@ -130,14 +134,17 @@ async function initialize() {
     });
 
     // Product - SKU
-    db.Product.hasMany(db.SKU, { foreignKey: "fk_product_id" });
+    db.Product.hasMany(db.SKU, { as: "sku", foreignKey: "fk_product_id" });
     db.SKU.belongsTo(db.Product, {
         foreignKey: "fk_product_id",
         as: "product",
     });
 
     // Product - UnitConversion
-    db.Product.hasMany(db.UnitConversion, { foreignKey: "fk_product_id" });
+    db.Product.hasMany(db.UnitConversion, {
+        as: "unitConversion",
+        foreignKey: "fk_product_id",
+    });
     db.UnitConversion.belongsTo(db.Product, {
         foreignKey: "fk_product_id",
         as: "product",
