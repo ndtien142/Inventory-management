@@ -182,6 +182,7 @@ async function initialize() {
         through: db.OrderLineItem,
         foreignKey: "fk_sku_no",
     });
+    db.sequelize = sequelize;
     // sync all models with database
     await sequelize.sync({ alter: true });
 }

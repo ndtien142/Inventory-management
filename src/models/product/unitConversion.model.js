@@ -4,7 +4,7 @@ module.exports = model;
 
 function model(sequelize) {
     const attributes = {
-        id: { type: DataTypes.BIGINT, primaryKey: true },
+        id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true },
         base_unit_id: { type: DataTypes.BIGINT, allowNull: false },
         conversion_unit_id: { type: DataTypes.BIGINT, allowNull: false },
         rate_conversion: { type: DataTypes.FLOAT, allowNull: false },
