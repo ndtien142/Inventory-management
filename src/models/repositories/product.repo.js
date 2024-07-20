@@ -148,7 +148,7 @@ const getDetailProduct = async (productId) => {
     });
 };
 
-const findAllProduct = async ({ limit = 20, offset = 20 }) => {
+const findAllProduct = async ({ limit = 20, offset = 0 }) => {
     return await db.Product.findAndCountAll({
         limit: parseInt(limit),
         offset: parseInt(offset),
