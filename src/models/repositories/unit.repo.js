@@ -13,17 +13,18 @@ const getUnitById = async (id) => {
 const getAllUnit = async () => {
     return await db.Unit.findAll();
 };
-const updateUnit = async ({ id, name }) => {
-    return await db.Role.update(
+const updateUnit = async (id, { name }) => {
+    const unit = getUnitById(id);
+    return await db.Unit.update(
         {
-            name,
+            name: name || unit.name,
             update_time: new Date(),
         },
         { where: { id: id } }
     );
 };
 const deleteUnit = async (id) => {
-    return await db.Role.destroy({ where: { id: id } });
+    return await db.Unit.destroy({ where: { id: id } });
 };
 const getUnitByName = async (unitName) => {
     return db.Unit.findOne({ where: { name: unitName } });
