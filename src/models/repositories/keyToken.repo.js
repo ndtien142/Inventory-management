@@ -7,6 +7,19 @@ const createKeyToken = async ({
     refreshToken = "",
 }) => {
     try {
+        const foundTokens = await db.KeyToken.findOne({
+            where: { fk_user_code: userCode },
+        });
+        if (foundTokens) {
+            await updateKeyToken({
+                id: foundTokens.id,
+                privateKey,
+                publicKey,
+                refreshToken,
+            });
+            return foundTokens;
+        }
+
         const tokens = await db.KeyToken.create({
             privateKey,
             publicKey,

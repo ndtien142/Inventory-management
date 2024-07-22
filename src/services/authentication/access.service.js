@@ -20,6 +20,43 @@ const {
 } = require("../../models/repositories/keyToken.repo");
 
 class AccessService {
+    // static handlerRefreshTokenV2 = async ({ refreshToken, user, keyStore }) => {
+    //     const { userId, email } = user;
+
+    //     if (keyStore.refreshTokensUsed.includes(refreshToken)) {
+    //         await KeyTokenService.deleteKeyById(userId);
+    //         throw new ForbiddenError(
+    //             "Something wrong happened!! Please login again"
+    //         );
+    //     }
+
+    //     if (keyStore.refreshToken !== refreshToken)
+    //         throw new AuthFailureError("Email not registered!");
+
+    //     // check UserId
+    //     const foundEmail = await findByEmail({ email });
+
+    //     if (!foundEmail) throw new AuthFailureError("Email not registered 2!");
+
+    //     // create new token pair
+    //     const tokens = await createTokenPair(
+    //         { userId, email },
+    //         keyStore.publicKey,
+    //         keyStore.privateKey
+    //     );
+
+    //     // update token to token used
+    //     await KeyTokenService.updateTokenByRefreshToken(
+    //         tokens.refreshToken,
+    //         refreshToken
+    //     );
+
+    //     return {
+    //         user,
+    //         tokens: tokens,
+    //     };
+    // };
+
     static logout = async ({ userCode }) => {
         const delKeyStore = await removeKeyTokenByUserCode(userCode);
         return delKeyStore;
@@ -64,13 +101,12 @@ class AccessService {
             publicKey,
             privateKey
         );
-        createKeyToken({
-            useCode: foundAccount.user_code,
+        await createKeyToken({
+            userCode: foundAccount.user_code,
             refreshToken: tokens.refreshToken,
             privateKey,
             publicKey,
         });
-
         return {
             code: 200,
             tokens,
