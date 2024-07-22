@@ -9,6 +9,7 @@ function model(sequelize) {
         id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
         fk_provider_id: { type: DataTypes.BIGINT, allowNull: false },
         expected_arrival_date: { type: DataTypes.DATE, allowNull: false },
+        total_amount: { type: DataTypes.DECIMAL(18, 0), allowNull: false },
         status: { type: DataTypes.TINYINT, allowNull: false },
     };
 

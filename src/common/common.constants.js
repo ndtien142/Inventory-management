@@ -24,11 +24,10 @@ const ORDER_STATUS = Object.freeze({
 });
 
 const PURCHASE_STATUS = Object.freeze({
-    PENDING: "pending",
-    PROCESSING: "processing",
-    SHIPPED: "shipped",
-    DELIVERED: "delivered",
-    CANCELLED: "cancelled",
+    CREATED: 1,
+    PROCESSING: 2,
+    DELIVERED: 3,
+    CANCELLED: 4,
 });
 
 module.exports = {

@@ -79,6 +79,10 @@ const updateNestedObject = (obj) => {
     return final;
 };
 
+const getKeyByValue = (object, value) => {
+    return Object.keys(object).find((key) => object[key] === value);
+};
+
 module.exports = {
     getInfoData,
     getSelectData,
@@ -87,4 +91,5 @@ module.exports = {
     updateNestedObject,
     convertToObjectIdMongodb,
     generateUserCode,
+    getKeyByValue,
 };

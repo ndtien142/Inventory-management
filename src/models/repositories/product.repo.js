@@ -1,5 +1,6 @@
 "use strict";
 
+const { BadRequestError } = require("../../core/error.response");
 const db = require("../../dbs/init.sqlserver");
 const slugify = require("slugify");
 
@@ -59,7 +60,7 @@ const createNewProduct = async ({
                 {
                     base_unit_id: unit.baseUnit.id,
                     conversion_unit_id: unit.conversionUnit.id,
-                    rate_conversion: unit.conversionUnit.rateConversion,
+                    rate_conversion: unit.rateConversion,
                     fk_product_id: product.product_id,
                     is_deleted: false,
                 },
@@ -167,8 +168,13 @@ const findAllProduct = async ({ limit = 20, offset = 0 }) => {
     });
 };
 
+const getProductSku = async (skuNo) => {
+    return await db.SKU.findByPk(skuNo);
+};
+
 module.exports = {
     createNewProduct,
     getDetailProduct,
     findAllProduct,
+    getProductSku,
 };

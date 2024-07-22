@@ -17,7 +17,7 @@ function model(sequelize) {
             allowNull: false,
             // unique: true
         },
-        contact_infor: { type: DataTypes.TEXT, allowNull: false },
+        contact_info: { type: DataTypes.TEXT, allowNull: false },
         is_active: {
             type: DataTypes.BOOLEAN,
             // defaultValue: true,
