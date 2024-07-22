@@ -141,6 +141,95 @@ class PurchaseService {
             }),
         };
     }
+
+    static async updatePurchaseStatus(purchaseId, newStatus, user) {
+        if (!Object.keys(PURCHASE_STATUS).includes(newStatus)) {
+            throw new BadRequestError("Invalid status key");
+        }
+
+        const t = await db.sequelize.transaction();
+
+        try {
+            const purchase = await getDetailPurchase(purchaseId, t);
+
+            if (!purchase) {
+                throw new NotFoundError("Purchase not found");
+            }
+
+            if (
+                purchase.status === PURCHASE_STATUS.DELIVERED ||
+                purchase.status === PURCHASE_STATUS.CANCELLED
+            ) {
+                throw new BadRequestError("Cannot update purchase");
+            }
+
+            if (newStatus === getKeyByValue(PURCHASE_STATUS, 3)) {
+                for (const detail of purchase.SKUs) {
+                    const sku = await db.SKU.findByPk(detail.sku_no, {
+                        transaction: t,
+                    });
+                    sku.stock =
+                        parseInt(sku.stock) +
+                        parseInt(detail.DetailPurchase.quantity);
+                    await sku.save({ transaction: t });
+                }
+            }
+
+            purchase.status = PURCHASE_STATUS[newStatus];
+
+            await purchase.save({ transaction: t });
+
+            await db.DetailPurchaseActivity.create(
+                {
+                    fk_admin_id: user.userCode,
+                    fk_purchase_id: purchase.id,
+                    status: PURCHASE_STATUS[newStatus],
+                },
+                { transaction: t }
+            );
+
+            await t.commit();
+            return {
+                id: purchase.id,
+                expectedArrivalDate: purchase.expected_arrival_date,
+                status: getKeyByValue(PURCHASE_STATUS, purchase.status),
+                totalAmount: purchase.total_amount,
+                provider: {
+                    id: purchase.provider.id,
+                    name: purchase.provider.name,
+                    contactInfo: purchase.provider.contact_info,
+                    status: purchase.provider.status,
+                },
+                details: purchase.SKUs.map((sku) => {
+                    return {
+                        skuNo: sku.sku_no,
+                        product: {
+                            id: sku.product.product_id,
+                            name: sku.product.product_name,
+                            description: sku.product.product_desc,
+                            thumbnail: sku.product.thumbnail,
+                            status: sku.product.status,
+                        },
+                        skuName: sku.sku_name,
+                        skuDescription: sku.sku_description,
+                        skuImage: sku.sku_image,
+                        skuPrice: sku.price,
+                        purchase: {
+                            id: sku.DetailPurchase.fk_purchase_id,
+                            unitPrice: sku.DetailPurchase.unit_price,
+                            quantity: sku.DetailPurchase.quantity,
+                            subTotal:
+                                parseInt(sku.DetailPurchase.quantity) *
+                                sku.DetailPurchase.unit_price,
+                        },
+                    };
+                }),
+            };
+        } catch (error) {
+            await t.rollback();
+            throw error;
+        }
+    }
 }
 
 module.exports = PurchaseService;

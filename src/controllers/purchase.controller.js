@@ -18,6 +18,16 @@ class PurchaseController {
             ),
         }).send(res);
     };
+    updatePurchaseStatus = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Update purchase status successfully",
+            metadata: await purchaseService.updatePurchaseStatus(
+                req.params.purchaseId,
+                req.body.status,
+                req.user
+            ),
+        }).send(res);
+    };
 }
 
 module.exports = new PurchaseController();

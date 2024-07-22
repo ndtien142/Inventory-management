@@ -45,7 +45,7 @@ const createNewPurchase = async ({
     }
 };
 
-const getDetailPurchase = async (purchaseId) => {
+const getDetailPurchase = async (purchaseId, transaction) => {
     return await db.Purchase.findByPk(purchaseId, {
         include: [
             {
@@ -60,6 +60,7 @@ const getDetailPurchase = async (purchaseId) => {
             },
         ],
         attributes: ["id", "expected_arrival_date", "status", "total_amount"],
+        transaction: transaction || null,
     });
 };
 
