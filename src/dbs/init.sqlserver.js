@@ -97,6 +97,11 @@ async function initialize() {
         foreignKey: "parent_category_id",
         as: "parentCategory",
     });
+    db.Category.hasMany(db.Category, {
+        as: "children",
+        foreignKey: "parent_category_id",
+    });
+
     db.Product.belongsTo(db.Brand, {
         foreignKey: "product_brand_id",
         as: "brand",
