@@ -38,6 +38,7 @@ app.use(
             "Access-Control-Request-Headers",
             "Access-Control-Request-Method",
             "X-Client-Id",
+            "X-Api-Key",
         ],
     })
 );
