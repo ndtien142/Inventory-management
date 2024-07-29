@@ -12,6 +12,7 @@ router.use(permission("0000"));
 
 router.use("/account", require("./access"));
 
+router.use("/unit", require("./unit"));
 router.use("/brand", require("./brand"));
 router.use("/category", require("./category"));
 

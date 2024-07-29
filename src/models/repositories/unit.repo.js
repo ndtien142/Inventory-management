@@ -10,8 +10,12 @@ const createNewUnit = async ({ name }) => {
 const getUnitById = async (id) => {
     return await db.Unit.findByPk(parseInt(id));
 };
-const getAllUnit = async () => {
-    return await db.Unit.findAll();
+const getAllUnit = async ({ offset, limit }) => {
+    return await db.Unit.findAndCountAll({
+        offset: parseInt(offset),
+        limit: parseInt(limit),
+        order: [["name", "ASC"]],
+    });
 };
 const updateUnit = async (id, { name }) => {
     const unit = getUnitById(id);

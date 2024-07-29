@@ -50,7 +50,7 @@ class CategoryService {
                 };
             }),
             meta: {
-                itemCount: categories.length,
+                currentPage: parseInt(page),
                 itemsPerPage: parseInt(limit),
                 totalItems: count,
                 totalPages: Math.ceil(count / parseInt(limit)),
@@ -93,7 +93,7 @@ class CategoryService {
                 };
             }),
             meta: {
-                itemCount: categories.length,
+                currentPage: parseInt(page),
                 itemsPerPage: parseInt(limit),
                 totalItems: count,
                 totalPages: Math.ceil(count / parseInt(limit)),

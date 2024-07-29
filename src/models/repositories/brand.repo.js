@@ -10,7 +10,7 @@ const getBrandById = async (id, option) => {
     return await db.Brand.findByPk(parseInt(id), option);
 };
 const getAllBrand = async ({ offset = 0, limit = 20 }) => {
-    return await db.Brand.findAll({
+    return await db.Brand.findAndCountAll({
         offset: parseInt(offset),
         limit: parseInt(limit),
         order: [["brand_name", "ASC"]],

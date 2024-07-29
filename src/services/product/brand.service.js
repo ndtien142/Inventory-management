@@ -16,24 +16,31 @@ class BrandService {
         }
         return {
             id: brand.id,
-            name: brad.brand_name,
+            name: brand.brand_name,
             description: brand.brand_description,
         };
     };
 
     static getAllBrand = async ({ page = 1, limit = 20 }) => {
         const offset = (parseInt(page) - 1) * parseInt(limit);
-        const brands = await getAllBrand({ offset, limit });
-        return (
-            brands &&
-            brands.map((brand) => {
-                return {
-                    id: brand.id,
-                    name: brand.brand_name,
-                    description: brand.brand_description,
-                };
-            })
-        );
+        const { rows: brands, count } = await getAllBrand({ offset, limit });
+        return {
+            items:
+                brands &&
+                brands.map((brand) => {
+                    return {
+                        id: brand.id,
+                        name: brand.brand_name,
+                        description: brand.brand_description,
+                    };
+                }),
+            meta: {
+                itemsPerPage: parseInt(limit),
+                totalItems: count,
+                currentPage: page,
+                totalPages: Math.ceil(count / parseInt(limit)),
+            },
+        };
     };
 
     static updateBrand = async (brandId, { name, description }) => {
