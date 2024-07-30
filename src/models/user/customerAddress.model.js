@@ -6,7 +6,7 @@ module.exports = model;
 
 function model(sequelize) {
     const attributes = {
-        id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
+        id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
         fk_user_code: { type: DataTypes.STRING(20), allowNull: false },
         address_line1: { type: DataTypes.STRING(255), allowNull: false },
         address_line2: { type: DataTypes.STRING(255), allowNull: true },

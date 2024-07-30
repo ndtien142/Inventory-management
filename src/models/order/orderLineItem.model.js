@@ -6,7 +6,7 @@ module.exports = model;
 
 function model(sequelize) {
     const attributes = {
-        quantity: { type: DataTypes.BIGINT, allowNull: false },
+        quantity: { type: DataTypes.INTEGER, allowNull: false },
         price_per_unit: { type: DataTypes.DECIMAL(18, 2), allowNull: false },
         unit_name: { type: DataTypes.STRING(255), allowNull: true },
         sub_total: { type: DataTypes.DECIMAL(18, 2), allowNull: false },

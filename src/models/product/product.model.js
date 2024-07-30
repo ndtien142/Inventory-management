@@ -25,8 +25,8 @@ function model(sequelize) {
             // defaultValue: false,
             allowNull: false,
         },
-        product_category_id: { type: DataTypes.BIGINT, allowNull: false },
-        product_brand_id: { type: DataTypes.BIGINT, allowNull: false },
+        product_category_id: { type: DataTypes.INTEGER, allowNull: false },
+        product_brand_id: { type: DataTypes.INTEGER, allowNull: false },
     };
 
     const options = {

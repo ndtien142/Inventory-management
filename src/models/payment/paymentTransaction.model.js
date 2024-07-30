@@ -6,9 +6,9 @@ module.exports = model;
 
 function model(sequelize) {
     const attributes = {
-        id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
-        fk_order_id: { type: DataTypes.BIGINT, allowNull: false },
-        fk_payment_method_id: { type: DataTypes.BIGINT, allowNull: false },
+        id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+        fk_order_id: { type: DataTypes.INTEGER, allowNull: false },
+        fk_payment_method_id: { type: DataTypes.INTEGER, allowNull: false },
         transaction_date: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,

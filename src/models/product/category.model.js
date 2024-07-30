@@ -4,14 +4,14 @@ module.exports = model;
 
 function model(sequelize) {
     const attributes = {
-        id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
+        id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
         name: {
             type: DataTypes.STRING(255),
             allowNull: false,
             // unique: true
         },
         description: { type: DataTypes.TEXT, allowNull: false },
-        parent_category_id: { type: DataTypes.BIGINT, allowNull: true },
+        parent_category_id: { type: DataTypes.INTEGER, allowNull: true },
     };
 
     const options = {

@@ -23,9 +23,9 @@ function model(sequelize) {
             // defaultValue: false,
             allowNull: true,
         },
-        fk_unit_id: { type: DataTypes.BIGINT, allowNull: false },
+        fk_unit_id: { type: DataTypes.INTEGER, allowNull: false },
         price: { type: DataTypes.DECIMAL(38, 0), allowNull: false },
-        stock: { type: DataTypes.BIGINT, allowNull: false },
+        stock: { type: DataTypes.INTEGER, allowNull: false },
     };
 
     const options = {
