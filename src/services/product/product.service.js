@@ -95,7 +95,7 @@ class ProductService {
                 },
             })),
             meta: {
-                itemCount: products.length,
+                currentPage: page,
                 itemsPerPage: parseInt(limit),
                 totalItems: count,
                 totalPages: Math.ceil(count / parseInt(limit)),
@@ -424,6 +424,17 @@ class ProductService {
     static deleteProduct = async (productId) => {
         // delete product from database by id
         // return deleted product
+    };
+    static editStatusProduct = async (productId) => {
+        const foundProduct = await getDetailProduct(productId);
+        if (!foundProduct) {
+            throw new NotFoundError("Product not found");
+        }
+        foundProduct.is_active = !foundProduct.is_active;
+
+        await foundProduct.save();
+
+        return foundProduct;
     };
 }
 

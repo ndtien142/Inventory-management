@@ -36,6 +36,14 @@ class ProductController {
             ),
         }).send(res);
     };
+    updateStatusProduct = async function (req, res, next) {
+        new SuccessResponse({
+            message: "Update Product Status Successfully",
+            metadata: await ProductService.editStatusProduct(
+                req.params.productId
+            ),
+        }).send(res);
+    };
 }
 
 module.exports = new ProductController();
