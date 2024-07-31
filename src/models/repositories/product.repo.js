@@ -172,9 +172,32 @@ const getProductSku = async (skuNo) => {
     return await db.SKU.findByPk(skuNo);
 };
 
+const findAllSKUProduct = async ({ offset = 0, limit = 20 }) => {
+    return await db.SKU.findAndCountAll({
+        where: {
+            is_deleted: false,
+        },
+        offset,
+        limit,
+        include: [
+            {
+                model: db.Product,
+                as: "product",
+                attributes: ["product_id", "product_name"],
+            },
+            {
+                model: db.Unit,
+                as: "unit",
+                attributes: ["id", "name"],
+            },
+        ],
+    });
+};
+
 module.exports = {
     createNewProduct,
     getDetailProduct,
     findAllProduct,
     getProductSku,
+    findAllSKUProduct,
 };

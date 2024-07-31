@@ -4,6 +4,7 @@ const {
     createNewProduct,
     getDetailProduct,
     findAllProduct,
+    findAllSKUProduct,
 } = require("../../models/repositories/product.repo");
 const {
     createNewProductSchema,
@@ -435,6 +436,22 @@ class ProductService {
         await foundProduct.save();
 
         return foundProduct;
+    };
+    static getListSKUProduct = async ({ page, limit }) => {
+        const offset = (parseInt(page) - 1) * parseInt(limit);
+        const { rows: skus, count } = await findAllSKUProduct({
+            offset,
+            limit: parseInt(limit),
+        });
+        return {
+            items: skus,
+            meta: {
+                currentPage: parseInt(page),
+                itemsPerPage: parseInt(limit),
+                totalItems: count,
+                totalPages: Math.ceil(count / parseInt(limit)),
+            },
+        };
     };
 }
 

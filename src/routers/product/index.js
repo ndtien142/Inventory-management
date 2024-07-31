@@ -6,6 +6,7 @@ const productController = require("../../controllers/product.controller");
 const router = express.Router();
 
 router.get("", asyncHandler(productController.getListProduct));
+router.get("/sku", asyncHandler(productController.getSKUProduct));
 router.get("/:productId", asyncHandler(productController.getDetailProduct));
 
 router.post("", asyncHandler(productController.createNewProduct));

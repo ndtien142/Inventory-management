@@ -44,6 +44,15 @@ class ProductController {
             ),
         }).send(res);
     };
+    getSKUProduct = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Get List SKU Product Successfully",
+            metadata: await ProductService.getListSKUProduct({
+                limit: req.query.limit,
+                page: req.query.page,
+            }),
+        }).send(res);
+    };
 }
 
 module.exports = new ProductController();
