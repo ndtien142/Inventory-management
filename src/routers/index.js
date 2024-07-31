@@ -19,5 +19,6 @@ router.use("/category", require("./category"));
 router.use("/admin/role", require("./role"));
 router.use("/admin/product", require("./product"));
 router.use("/admin/purchase", require("./purchase"));
+router.use("/admin/provider", require("./provider"));
 
 module.exports = router;

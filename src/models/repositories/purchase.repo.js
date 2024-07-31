@@ -64,7 +64,25 @@ const getDetailPurchase = async (purchaseId, transaction) => {
     });
 };
 
+const getAllPurchase = async ({ offset = 0, limit = 20, transaction }) => {
+    return await db.Purchase.findAndCountAll({
+        offset: parseInt(offset),
+        limit: parseInt(limit),
+        include: [
+            {
+                model: db.Provider,
+                as: "provider",
+                attributes: ["id", "name", "contact_info", "is_active"],
+            },
+        ],
+        attributes: ["id", "expected_arrival_date", "status", "total_amount"],
+        order: [["id", "DESC"]],
+        transaction: transaction || null,
+    });
+};
+
 module.exports = {
     createNewPurchase,
     getDetailPurchase,
+    getAllPurchase,
 };

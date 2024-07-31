@@ -9,6 +9,7 @@ const router = express.Router();
 router.use(authenticationV2);
 
 router.post("", asyncHandler(purchaseController.createPurchase));
+router.get("", asyncHandler(purchaseController.getAllPurchase));
 router.get("/:purchaseId", asyncHandler(purchaseController.getDetailPurchase));
 router.post(
     "/update-status/:purchaseId",

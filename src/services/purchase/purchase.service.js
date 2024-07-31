@@ -9,6 +9,7 @@ const {
 const {
     createNewPurchase,
     getDetailPurchase,
+    getAllPurchase,
 } = require("../../models/repositories/purchase.repo");
 const { getProductSku } = require("../../models/repositories/product.repo");
 const { getKeyByValue } = require("../../utils");
@@ -229,6 +230,37 @@ class PurchaseService {
             await t.rollback();
             throw error;
         }
+    }
+
+    static async getAllPurchase({ page = 1, limit = 20 }) {
+        const offset = (parseInt(page) - 1) * limit;
+        const { rows: purchases, count } = await getAllPurchase({
+            offset,
+            limit,
+        });
+
+        return {
+            items: purchases.map((purchase) => {
+                return {
+                    id: purchase.id,
+                    expectedArrivalDate: purchase.expected_arrival_date,
+                    status: getKeyByValue(PURCHASE_STATUS, purchase.status),
+                    totalAmount: purchase.total_amount,
+                    provider: {
+                        id: purchase.provider.id,
+                        name: purchase.provider.name,
+                        contactInfo: purchase.provider.contact_info,
+                        status: purchase.provider.status,
+                    },
+                };
+            }),
+            meta: {
+                currentPage: page,
+                itemsPerPage: parseInt(limit),
+                totalItems: count,
+                totalPages: Math.ceil(count / parseInt(limit)),
+            },
+        };
     }
 }
 

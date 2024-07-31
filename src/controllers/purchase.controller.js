@@ -28,6 +28,12 @@ class PurchaseController {
             ),
         }).send(res);
     };
+    getAllPurchase = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Get all purchase successfully",
+            metadata: await purchaseService.getAllPurchase(req.query),
+        }).send(res);
+    };
 }
 
 module.exports = new PurchaseController();
