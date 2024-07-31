@@ -42,6 +42,12 @@ class AccessController {
             metadata: await AccessService.signUp(req.body),
         }).send(res);
     };
+    getUserProfile = async (req, res, next) => {
+        new SuccessResponse({
+            message: "Get user profile successfully",
+            metadata: await AccessService.getUserProfile(req.user.userCode),
+        }).send(res);
+    };
 }
 
 module.exports = new AccessController();

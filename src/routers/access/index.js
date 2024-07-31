@@ -9,4 +9,7 @@ const router = express.Router();
 router.post("/signup", asyncHandler(accessController.signUp));
 router.post("/login", asyncHandler(accessController.login));
 
+router.use(authenticationV2);
+router.get("/profile", asyncHandler(accessController.getUserProfile));
+
 module.exports = router;

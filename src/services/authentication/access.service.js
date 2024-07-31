@@ -8,11 +8,13 @@ const {
     BadRequestError,
     AuthFailureError,
     ForbiddenError,
+    NotFoundError,
 } = require("../../core/error.response");
 const { getRoleByName } = require("../../models/repositories/role.repo");
 const {
     createAccount,
     getAccountByUsername,
+    getAccountProfile,
 } = require("../../models/repositories/account.repo");
 const {
     createKeyToken,
@@ -198,6 +200,22 @@ class AccessService {
         return {
             code: 201,
             metadata: null,
+        };
+    };
+
+    static getUserProfile = async (userId) => {
+        const account = await getAccountProfile(userId);
+        if (!account) throw new NotFoundError("Profile not found");
+
+        return {
+            code: 200,
+            user: {
+                userCode: account.user_code,
+                username: account.username,
+                role: account.role.role_name,
+                isActive: account.is_active,
+                isBlock: account.is_block,
+            },
         };
     };
 }

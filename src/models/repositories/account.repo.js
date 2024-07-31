@@ -66,6 +66,18 @@ const getAccountByUsername = async (username) => {
     return db.Account.findOne({ where: { username } });
 };
 
+const getAccountProfile = async (userId) => {
+    const account = await db.Account.findByPk(userId, {
+        include: [
+            {
+                model: db.Role,
+                as: "role",
+            },
+        ],
+    });
+    return account;
+};
+
 module.exports = {
     createAccount,
     getAccountByUserCode,
@@ -74,4 +86,5 @@ module.exports = {
     deleteAccount,
     blockAccount,
     getAccountByUsername,
+    getAccountProfile,
 };

@@ -444,7 +444,26 @@ class ProductService {
             limit: parseInt(limit),
         });
         return {
-            items: skus,
+            items: skus.map((sku) => {
+                return {
+                    skuNo: sku.sku_no,
+                    skuName: sku.sku_name,
+                    skuDescription: sku.sku_description,
+                    price: sku.price,
+                    stock: sku.stock,
+                    skuImage: sku.sku_image,
+                    unit: {
+                        id: sku.unit.id,
+                        name: sku.unit.name,
+                    },
+                    product: {
+                        id: sku.product.product_id,
+                        name: sku.product.product_name,
+                    },
+                    isDefault: !!sku.is_default,
+                    isDeleted: !!sku.is_deleted,
+                };
+            }),
             meta: {
                 currentPage: parseInt(page),
                 itemsPerPage: parseInt(limit),
