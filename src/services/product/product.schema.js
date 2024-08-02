@@ -40,9 +40,9 @@ const updateProductSchema = () => {
         sku: Joi.array().items(
             Joi.object({
                 skuNo: Joi.string().required(),
-                skuName: Joi.string(),
-                skuDescription: Joi.string(),
-                skuImage: Joi.string().uri(),
+                // skuName: Joi.string(),
+                // skuDescription: Joi.string(),
+                // skuImage: Joi.string().uri(),
                 isDefault: Joi.boolean(),
                 isDeleted: Joi.boolean(),
                 price: Joi.number(),
@@ -101,9 +101,9 @@ const createNewProductSchema = () => {
         sku: Joi.array()
             .items(
                 Joi.object({
-                    skuName: Joi.string().required(),
-                    skuDescription: Joi.string().required(),
-                    skuImage: Joi.string().uri().required(),
+                    // skuName: Joi.string().required(),
+                    // skuDescription: Joi.string().required(),
+                    // skuImage: Joi.string().uri().required(),
                     isDefault: Joi.boolean().default(false),
                     isDeleted: Joi.boolean().default(false),
                     price: Joi.number().required(),

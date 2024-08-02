@@ -326,7 +326,7 @@ class ProductService {
                     if (sku) {
                         await sku.update(
                             {
-                                sku_name: skuData.skuName || skuData.sku_name,
+                                // sku_name: skuData.skuName || skuData.sku_name,
                                 is_default:
                                     skuData.isDefault !== undefined
                                         ? !!skuData.isDefault
@@ -338,18 +338,17 @@ class ProductService {
                                 price: skuData.price || sku.price,
                                 stock: skuData.stock || sku.stock,
                                 fk_unit_id: skuData.unit.id || sku.unit.id,
-                                sku_image: skuData.skuImage || sku.sku_image,
-                                update_time: new Date(),
+                                // sku_image: skuData.skuImage || sku.sku_image,
                             },
                             { transaction }
                         );
                     } else {
                         await db.SKU.create(
                             {
-                                sku_name: skuData.skuName,
+                                // sku_name: skuData.skuName,
                                 price: skuData.price,
                                 stock: skuData.stock,
-                                sku_image: skuData.skuImage,
+                                // sku_image: skuData.skuImage,
                                 fk_product_id: productId,
                                 fk_unit_id: skuData.unit.id,
                                 is_default: !!skuData.isDefault,
@@ -404,9 +403,9 @@ class ProductService {
                 })),
                 sku: updateProduct.sku.map((sku) => ({
                     skuNo: sku.sku_no,
-                    skuName: sku.sku_name,
-                    skuDescription: sku.sku_description,
-                    skuImage: sku.sku_image,
+                    // skuName: sku.sku_name,
+                    // skuDescription: sku.sku_description,
+                    // skuImage: sku.sku_image,
                     isDefault: !!sku.is_default,
                     isDeleted: !!sku.is_deleted,
                     price: sku.price,
@@ -447,11 +446,11 @@ class ProductService {
             items: skus.map((sku) => {
                 return {
                     skuNo: sku.sku_no,
-                    skuName: sku.sku_name,
-                    skuDescription: sku.sku_description,
+                    // skuName: sku.sku_name,
+                    // skuDescription: sku.sku_description,
                     price: sku.price,
                     stock: sku.stock,
-                    skuImage: sku.sku_image,
+                    // skuImage: sku.sku_image,
                     unit: {
                         id: sku.unit.id,
                         name: sku.unit.name,

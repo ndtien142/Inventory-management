@@ -68,7 +68,7 @@ const createNewProduct = async ({
             );
         }
         for (const item of sku) {
-            const skuNo = `${product.product_id}-${slugify(item.skuName, { lower: true, strict: true })}`;
+            const skuNo = `${product.product_id}-${item.unit.name}`;
 
             if (!units[item.unit.id]) {
                 units[item.unit.id] = await db.Unit.findOrCreate({
@@ -82,14 +82,14 @@ const createNewProduct = async ({
                 {
                     sku_no: skuNo,
                     fk_product_id: product.product_id,
-                    sku_name: item.skuName,
-                    sku_description: item.skuDescription,
-                    sku_image: item.skuImage,
+                    price: item.price,
+                    stock: 0,
                     is_default: item.isDefault,
                     is_deleted: item.isDeleted,
                     fk_unit_id: item.unit.id,
-                    price: item.price,
-                    stock: 0,
+                    // sku_name: item.skuName,
+                    // sku_description: item.skuDescription,
+                    // sku_image: item.skuImage,
                 },
                 { transaction }
             );

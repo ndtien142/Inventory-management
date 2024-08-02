@@ -9,13 +9,14 @@ function model(sequelize) {
             primaryKey: true,
             allowNull: false,
         },
+        price: { type: DataTypes.DECIMAL(38, 0), allowNull: false },
+        stock: { type: DataTypes.INTEGER, allowNull: false },
         fk_product_id: { type: DataTypes.STRING(100) },
-        sku_name: { type: DataTypes.STRING(500), allowNull: false },
-        sku_description: { type: DataTypes.TEXT, allowNull: false },
-        sku_image: { type: DataTypes.STRING(255), allowNull: false },
+        // sku_name: { type: DataTypes.STRING(500), allowNull: false },
+        // sku_description: { type: DataTypes.TEXT, allowNull: false },
+        // sku_image: { type: DataTypes.STRING(255), allowNull: false },
         is_default: {
-            type: DataTypes.TINYINT,
-            // defaultValue: 0,
+            type: DataTypes.BOOLEAN,
             allowNull: true,
         },
         is_deleted: {
@@ -24,8 +25,6 @@ function model(sequelize) {
             allowNull: true,
         },
         fk_unit_id: { type: DataTypes.INTEGER, allowNull: false },
-        price: { type: DataTypes.DECIMAL(38, 0), allowNull: false },
-        stock: { type: DataTypes.INTEGER, allowNull: false },
     };
 
     const options = {
