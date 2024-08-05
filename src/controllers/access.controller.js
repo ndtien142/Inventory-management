@@ -48,6 +48,12 @@ class AccessController {
             metadata: await AccessService.getUserProfile(req.user.userCode),
         }).send(res);
     };
+    signUpCustomer = async (req, res, next) => {
+        new CREATED({
+            message: "Registered OK",
+            metadata: await AccessService.signUpCustomer(req.body),
+        }).send(res);
+    };
 }
 
 module.exports = new AccessController();

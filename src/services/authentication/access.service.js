@@ -206,19 +206,107 @@ class AccessService {
         };
     };
 
+    static signUpCustomer = async ({ username, password }) => {
+        // step 1: check username exist
+        const existingAccount = await getAccountByUsername(username);
+        if (existingAccount) {
+            throw new BadRequestError("Error: Username already registered!");
+        }
+        // Step 2: hashing password
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        const role = await getRoleByName("customer");
+        if (!role) {
+            throw new BadRequestError("Role not found");
+        }
+
+        const newAccount = await createAccount({
+            userCode: generateUserCode(),
+            username,
+            password: passwordHash,
+            roleId: role.id,
+        });
+
+        if (newAccount) {
+            // created privateKey, publicKey
+            // use has private key
+            // system store public key
+            // private key use to sync token
+            // public key use to verify token
+            const { privateKey, publicKey } = crypto.generateKeyPairSync(
+                "rsa",
+                {
+                    modulusLength: 4096,
+                    publicKeyEncoding: {
+                        // public key cryptographic standard
+                        type: "pkcs1",
+                        format: "pem",
+                    },
+                    privateKeyEncoding: {
+                        // public key cryptographic standard
+                        type: "pkcs1",
+                        format: "pem",
+                    },
+                }
+            );
+            // if exist handle save to collection KeyStore
+            const publicKeyString = await createKeyToken({
+                userCode: newAccount.user_code,
+                publicKey,
+                privateKey,
+            });
+
+            if (!publicKeyString) {
+                throw new BadRequestError("Public key string error");
+            }
+
+            const publicKeyObject = crypto.createPublicKey(publicKeyString);
+            // create token pair
+            const tokens = await createTokenPair(
+                { userCode: newAccount.user_code, username },
+                publicKeyObject,
+                privateKey
+            );
+
+            return {
+                code: 201,
+                user: getInfoData({
+                    fields: ["user_code", "username", "is_active", "is_block"],
+                    object: newAccount,
+                }),
+                tokens: tokens,
+            };
+        }
+        return {
+            code: 201,
+            metadata: null,
+        };
+    };
+
     static getUserProfile = async (userId) => {
         const account = await getAccountProfile(userId);
         if (!account) throw new NotFoundError("Profile not found");
 
         return {
-            code: 200,
-            user: {
-                userCode: account.user_code,
-                username: account.username,
-                role: account.role.role_name,
-                isActive: account.is_active,
-                isBlock: account.is_block,
+            userCode: account.user_code,
+            username: account.username,
+            role: account.role.role_name,
+            isActive: account.is_active,
+            isBlock: account.is_block,
+            role: {
+                id: account.role.id,
+                name: account.role.role_name,
             },
+            profiles: account.profile.map((item) => {
+                return {
+                    id: item.id,
+                    firstName: item.first_name,
+                    lastName: item.last_name,
+                    phoneNumber: item.phone_number,
+                    address: item.address,
+                    avatarUrl: item.avatar_url,
+                };
+            }),
         };
     };
 }
