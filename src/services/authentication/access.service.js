@@ -82,6 +82,9 @@ class AccessService {
         );
         if (!matchPassword) throw new AuthFailureError("Authentication Error");
 
+        if (foundAccount.is_block || !foundAccount.is_active)
+            throw new AuthFailureError("Account has something wrong");
+
         // 3
         const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
             modulusLength: 4096,
