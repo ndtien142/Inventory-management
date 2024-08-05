@@ -74,6 +74,10 @@ async function initialize() {
     // create associations
     // One - One
     db.Account.belongsTo(db.Role, { foreignKey: "fk_role_id", as: "role" });
+    db.Account.hasMany(db.Profile, {
+        foreignKey: "fk_user_code",
+        as: "profile",
+    });
     db.Cart.belongsTo(db.Account, { foreignKey: "fk_user_code", as: "user" });
     db.KeyToken.belongsTo(db.Account, { foreignKey: "fk_user_code" });
     db.Order.belongsTo(db.PaymentMethod, {
@@ -120,6 +124,7 @@ async function initialize() {
         as: "conversionUnit",
     });
     db.Profile.belongsTo(db.Account, {
+        as: "account",
         foreignKey: "fk_user_code",
     });
     db.Purchase.belongsTo(db.Provider, {

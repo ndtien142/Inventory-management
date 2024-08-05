@@ -10,6 +10,7 @@ function model(sequelize) {
         fk_user_code: { type: DataTypes.STRING(20), allowNull: false },
         first_name: { type: DataTypes.STRING(255), allowNull: false },
         last_name: { type: DataTypes.STRING(255), allowNull: false },
+        avatar_url: { type: DataTypes.STRING(255) },
         phone_number: {
             type: DataTypes.STRING(20),
             allowNull: false,

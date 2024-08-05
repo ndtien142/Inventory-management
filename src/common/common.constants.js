@@ -16,11 +16,11 @@ const PAYMENT_TRANSACTION_STATUS = Object.freeze({
 });
 
 const ORDER_STATUS = Object.freeze({
-    PENDING: "pending",
-    PROCESSING: "processing",
-    SHIPPED: "shipped",
-    DELIVERED: "delivered",
-    CANCELLED: "cancelled",
+    PENDING: 1,
+    PROCESSING: 2,
+    SHIPPED: 3,
+    DELIVERED: 4,
+    CANCELLED: 5,
 });
 
 const PURCHASE_STATUS = Object.freeze({

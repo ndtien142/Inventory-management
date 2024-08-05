@@ -34,34 +34,28 @@ class RoleService {
     static getRoleById = async (id) => {
         const result = await getRoleById(id);
         if (!result) throw new NotFoundError("Role not found");
-        return getInfoData({
-            fields: [
-                "id",
-                "role_name",
-                "role_description",
-                "is_active",
-                "create_time",
-                "update_time",
-            ],
-            object: result,
-        });
+        return {
+            id: result.id,
+            name: result.role_name,
+            description: result.role_description,
+            isActive: result.is_active,
+            createTime: result.create_time,
+            updateTime: result.update_time,
+        };
     };
     static getAllRoles = async () => {
-        const result = getAllRoles();
+        const result = await getAllRoles();
         if (!result) throw new NotFoundError("Role not found");
-        return result.map((item) =>
-            getInfoData({
-                fields: [
-                    "id",
-                    "role_name",
-                    "role_description",
-                    "is_active",
-                    "create_time",
-                    "update_time",
-                ],
-                object: item,
-            })
-        );
+        return result.map((item) => {
+            return {
+                id: item.id,
+                name: item.role_name,
+                description: item.role_description,
+                isActive: item.is_active,
+                createTime: item.create_time,
+                updateTime: item.update_time,
+            };
+        });
     };
     static updateRole = async ({
         id,

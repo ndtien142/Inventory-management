@@ -164,6 +164,17 @@ const findAllProduct = async ({ limit = 20, offset = 0 }) => {
                 as: "category",
                 attributes: ["id", "name"],
             },
+            {
+                model: db.SKU,
+                as: "sku",
+                include: [
+                    {
+                        model: db.Unit,
+                        as: "unit",
+                        attributes: ["id", "name"],
+                    },
+                ],
+            },
         ],
     });
 };

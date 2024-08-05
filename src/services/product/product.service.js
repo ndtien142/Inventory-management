@@ -94,6 +94,19 @@ class ProductService {
                     id: product.category.id,
                     name: product.category.name,
                 },
+                sku: product.sku.map((item) => {
+                    return {
+                        skuNo: item.sku_no,
+                        price: item.price,
+                        stock: item.stock,
+                        isDefault: item.is_default,
+                        isDeleted: item.is_deleted,
+                        unit: {
+                            id: item.unit.id,
+                            name: item.unit.name,
+                        },
+                    };
+                }),
             })),
             meta: {
                 currentPage: page,

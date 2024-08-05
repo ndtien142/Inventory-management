@@ -12,9 +12,6 @@ function model(sequelize) {
         price: { type: DataTypes.DECIMAL(38, 0), allowNull: false },
         stock: { type: DataTypes.INTEGER, allowNull: false },
         fk_product_id: { type: DataTypes.STRING(100) },
-        // sku_name: { type: DataTypes.STRING(500), allowNull: false },
-        // sku_description: { type: DataTypes.TEXT, allowNull: false },
-        // sku_image: { type: DataTypes.STRING(255), allowNull: false },
         is_default: {
             type: DataTypes.BOOLEAN,
             allowNull: true,
