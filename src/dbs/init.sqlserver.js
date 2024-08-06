@@ -42,7 +42,6 @@ async function initialize() {
     db.Account = require("../models/authentication/account.model")(sequelize);
     db.Unit = require("../models/product/unit.model")(sequelize);
     db.Account = require("../models/authentication/account.model")(sequelize);
-    db.Cart = require("../models/order/cart.model")(sequelize);
     db.Category = require("../models/product/category.model")(sequelize);
     db.CustomerAddress = require("../models/user/customerAddress.model")(
         sequelize
@@ -59,7 +58,6 @@ async function initialize() {
     db.UnitConversion = require("../models/product/unitConversion.model")(
         sequelize
     );
-    db.CartLineItem = require("../models/order/cartLineItem.model")(sequelize);
     db.DetailPurchase = require("../models/purchase/detailPurchase.model")(
         sequelize
     );
@@ -78,7 +76,6 @@ async function initialize() {
         foreignKey: "fk_user_code",
         as: "profile",
     });
-    db.Cart.belongsTo(db.Account, { foreignKey: "fk_user_code", as: "user" });
     db.KeyToken.belongsTo(db.Account, { foreignKey: "fk_user_code" });
     db.Order.belongsTo(db.PaymentMethod, {
         foreignKey: "fk_payment_method_id",
@@ -184,16 +181,6 @@ async function initialize() {
     db.Account.belongsToMany(db.Purchase, {
         through: db.DetailPurchaseActivity,
         foreignKey: "fk_admin_id",
-    });
-
-    // Cart - CartLineItem - SKU
-    db.Cart.belongsToMany(db.SKU, {
-        through: db.CartLineItem,
-        foreignKey: "fk_cart_id",
-    });
-    db.SKU.belongsToMany(db.Cart, {
-        through: db.CartLineItem,
-        foreignKey: "fk_sku_no",
     });
 
     // Order - OrderLineItem - SKU
