@@ -1,0 +1,243 @@
+"use strict";
+
+const { ORDER_STATUS } = require("../../common/common.constants");
+const { BadRequestError } = require("../../core/error.response");
+const db = require("../../dbs/init.sqlserver");
+const { Op } = require("sequelize");
+
+class OrderService {
+    static async validateOrder({
+        addressId,
+        paymentMethodId,
+        orderDate,
+        totalAmount,
+        orderLineItems,
+    }) {
+        const address = await db.Address.findByPk(addressId);
+        if (!address) {
+            throw new BadRequestError(`Address ID not found: ${addressId}`);
+        }
+
+        const paymentMethod = await db.PaymentMethod.findByPk(paymentMethodId);
+        if (!paymentMethod) {
+            throw new BadRequestError(
+                `Payment Method ID not found: ${paymentMethodId}`
+            );
+        }
+
+        if (isNaN(totalAmount) || totalAmount <= 0) {
+            throw new BadRequestError(`Invalid totalAmount: ${totalAmount}`);
+        }
+
+        let calculatedTotalAmount = 0;
+        for (let item of orderLineItems) {
+            const expectedSubTotal = item.pricePerUnit * item.quantity;
+            if (item.subTotal !== expectedSubTotal) {
+                throw new BadRequestError(
+                    `SubTotal does not match calculated value for SKU: ${item.skuNo}`
+                );
+            }
+            calculatedTotalAmount += item.subTotal;
+        }
+
+        for (let item of orderLineItems) {
+            const product = await db.Product.findByPk(item.productId);
+            if (!product) {
+                throw new BadRequestError(
+                    `Product ID not found: ${item.productId}`
+                );
+            }
+
+            let sku = await db.SKU.findOne({ where: { skuNo: item.skuNo } });
+            if (!sku || sku.fk_product_id !== item.productId) {
+                throw new BadRequestError(
+                    `SKU not found or does not match Product ID: ${item.skuNo}`
+                );
+            }
+
+            if (item.pricePerUnit !== sku.price_per_unit) {
+                throw new BadRequestError(
+                    `PricePerUnit does not match SKU price for SKU: ${item.skuNo}`
+                );
+            }
+
+            const unit = await db.Unit.findByPk(item.unit.id);
+            if (!unit || unit.name !== item.unit.name) {
+                throw new BadRequestError(
+                    `Unit ID or Unit Name does not match for SKU: ${item.skuNo}`
+                );
+            }
+        }
+    }
+    static async createOrder({
+        userCode,
+        addressId,
+        paymentMethodId,
+        orderDate,
+        totalAmount,
+        paymentAmount,
+        orderLineItems,
+    }) {
+        const t = await db.sequelize.transaction();
+
+        try {
+            // Tạo đơn hàng
+            const order = await db.Order.create(
+                {
+                    fk_user_code: userCode,
+                    fk_address_id: addressId,
+                    fk_payment_id: 0,
+                    order_date: orderDate,
+                    total: totalAmount,
+                    order_status: ORDER_STATUS.PENDING,
+                    fk_payment_method_id: paymentMethodId,
+                },
+                { transaction: t }
+            );
+
+            // Xử lý từng dòng đơn hàng song song
+            const orderLinePromises = orderLineItems.map(async (item) => {
+                let sku = await db.SKU.findOne({
+                    where: { sku_no: item.skuNo },
+                    transaction: t,
+                });
+                if (!sku) {
+                    throw new BadRequestError(`SKU not found: ${item.skuNo}`);
+                }
+
+                let requiredQuantity = item.quantity;
+                let availableQuantity = sku.stock;
+
+                // Nếu số lượng tồn kho không đủ, xử lý chuyển đổi đơn vị
+                if (availableQuantity < requiredQuantity) {
+                    const conversions = await db.UnitConversion.findAll({
+                        where: {
+                            fk_product_id: item.productId,
+                            conversion_unit_id: item.unit.id,
+                        },
+                        order: [["rate_conversion", "DESC"]],
+                        transaction: t,
+                    });
+
+                    if (conversions.length === 0) {
+                        throw new BadRequestError(
+                            `Không đủ hàng và không có chuyển đổi cho SKU: ${item.skuNo}`
+                        );
+                    }
+
+                    let totalConvertedStock = 0;
+                    for (const conversion of conversions) {
+                        if (
+                            totalConvertedStock >=
+                            requiredQuantity - availableQuantity
+                        )
+                            break;
+
+                        const baseUnitSkus = await db.SKU.findAll({
+                            where: {
+                                fk_product_id: item.productId,
+                                fk_unit_id: conversion.base_unit_id,
+                                stock: {
+                                    [Op.gt]: 0,
+                                },
+                            },
+                            order: [["stock", "DESC"]],
+                            transaction: t,
+                        });
+
+                        for (const baseUnitSku of baseUnitSkus) {
+                            const availableBaseUnitStock = baseUnitSku.stock;
+                            const conversionRequired = Math.min(
+                                Math.ceil(
+                                    (requiredQuantity -
+                                        availableQuantity -
+                                        totalConvertedStock) /
+                                        conversion.rate_conversion
+                                ),
+                                availableBaseUnitStock
+                            );
+
+                            totalConvertedStock +=
+                                conversionRequired * conversion.rate_conversion;
+
+                            await baseUnitSku.update(
+                                {
+                                    stock:
+                                        availableBaseUnitStock -
+                                        conversionRequired,
+                                },
+                                { transaction: t }
+                            );
+
+                            if (
+                                totalConvertedStock >=
+                                requiredQuantity - availableQuantity
+                            )
+                                break;
+                        }
+                    }
+
+                    if (
+                        totalConvertedStock <
+                        requiredQuantity - availableQuantity
+                    ) {
+                        throw new BadRequestError(
+                            `Không đủ hàng để chuyển đổi cho SKU: ${item.skuNo}`
+                        );
+                    }
+
+                    await sku.update(
+                        { stock: availableQuantity + totalConvertedStock },
+                        { transaction: t }
+                    );
+                }
+
+                if (sku.stock < requiredQuantity) {
+                    throw new BadRequestError(
+                        `Insufficient stock for SKU: ${item.skuNo}`
+                    );
+                }
+
+                await sku.update(
+                    { stock: sku.stock - requiredQuantity },
+                    { transaction: t }
+                );
+
+                await db.OrderLineItem.create(
+                    {
+                        price_per_unit: item.pricePerUnit,
+                        unit_name: item.unit.name,
+                        quantity: item.quantity,
+                        sub_total: item.subTotal,
+                        fk_sku_no: item.skuNo,
+                        fk_order_id: order.id,
+                    },
+                    { transaction: t }
+                );
+            });
+
+            await Promise.all(orderLinePromises);
+
+            await db.PaymentTransactions.create(
+                {
+                    fk_order_id: order.id,
+                    fk_payment_method_id: paymentMethodId,
+                    transaction_date: orderDate,
+                    amount: totalAmount,
+                    transaction_status: "Pending",
+                    transaction_details: "tao moi",
+                },
+                { transaction: t }
+            );
+
+            await t.commit();
+            return order;
+        } catch (error) {
+            await t.rollback();
+            console.error("Error creating order:", error);
+            throw error;
+        }
+    }
+}
+
+module.exports = OrderService;

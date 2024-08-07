@@ -2,7 +2,7 @@
 
 const express = require("express");
 const { asyncHandler } = require("../../helpers/asyncHandler");
-const addressController = require("../../controllers/address.controller"); // Đường dẫn đến AddressController
+const addressController = require("../../controllers/address.controller");
 const { authenticationV2 } = require("../../auth/authUtils");
 const router = express.Router();
 

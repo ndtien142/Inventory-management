@@ -17,6 +17,7 @@ router.use("/unit", require("./unit"));
 router.use("/brand", require("./brand"));
 router.use("/category", require("./category"));
 router.use("/address", require("./address"));
+router.use("/order", require("./order"));
 
 router.use("/admin/role", require("./role"));
 router.use("/admin/user", require("./user"));
