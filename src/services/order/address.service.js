@@ -2,7 +2,6 @@
 
 const { NotFoundError, BadRequestError } = require("../../core/error.response");
 const db = require("../../dbs/init.sqlserver");
-const { Op } = require("sequelize");
 
 class AddressService {
     static async createAddress({
@@ -25,6 +24,13 @@ class AddressService {
 
         if (addressCount >= 5) {
             throw new BadRequestError("Bạn đã đạt giới hạn tối đa 5 địa chỉ.");
+        }
+
+        if (isDefault) {
+            await db.CustomerAddress.update(
+                { is_default: false },
+                { where: { fk_user_code: userCode, is_deleted: false } }
+            );
         }
 
         const newAddress = await db.CustomerAddress.create({
@@ -75,8 +81,8 @@ class AddressService {
                 fk_user_code: userCode,
                 is_deleted: false,
             },
+            order: [["is_default", "DESC"]],
         });
-        console.log(addresses);
         return addresses.map((address) => {
             return {
                 id: address.id,
@@ -109,21 +115,12 @@ class AddressService {
         if (!address || address.is_deleted) {
             throw new NotFoundError("Address not found");
         }
-        const addresses = await db.CustomerAddress.findAll({
-            where: {
-                fk_user_code: userCode,
-                is_deleted: false,
-                [Op.not]: {
-                    id: id,
-                },
-            },
-        });
         if (isDefault) {
-            addresses.forEach((address) => {
-                address.is_default = false;
-            });
+            await db.CustomerAddress.update(
+                { is_default: false },
+                { where: { fk_user_code: userCode, is_deleted: false } }
+            );
         }
-
         await address.update({
             address_line1: addressLine1 || address.address_line1,
             address_line2: addressLine2 || address.address_line2,
@@ -134,8 +131,6 @@ class AddressService {
             phone_number: phoneNumber || address.phone_number,
             update_time: new Date(),
         });
-
-        await addresses.save();
 
         return {
             addressLine1: address.address_line1,
@@ -151,6 +146,7 @@ class AddressService {
 
     static async deleteAddress(id) {
         const address = await db.CustomerAddress.findByPk(id);
+        console.log(address);
         if (!address || address.is_deleted) {
             throw new NotFoundError("Address not found");
         }
