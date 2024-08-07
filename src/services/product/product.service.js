@@ -99,12 +99,12 @@ class ProductService {
                         skuNo: item.sku_no,
                         price: item.price,
                         stock: item.stock,
-                        isDefault: item.is_default,
-                        isDeleted: item.is_deleted,
                         unit: {
                             id: item.unit.id,
                             name: item.unit.name,
                         },
+                        isDefault: item.is_default,
+                        isDeleted: item.is_deleted,
                     };
                 }),
             })),
@@ -156,17 +156,14 @@ class ProductService {
             })),
             sku: product.sku.map((sku) => ({
                 skuNo: sku.sku_no,
-                skuName: sku.sku_name,
-                skuDescription: sku.sku_description,
-                skuImage: sku.sku_image,
-                isDefault: !!sku.is_default,
-                isDeleted: !!sku.is_deleted,
                 price: sku.price,
+                stock: sku.stock,
                 unit: {
                     id: sku.unit.id,
                     name: sku.unit.name,
                 },
-                stock: sku.stock,
+                isDefault: !!sku.is_default,
+                isDeleted: !!sku.is_deleted,
             })),
         };
     };
@@ -459,11 +456,8 @@ class ProductService {
             items: skus.map((sku) => {
                 return {
                     skuNo: sku.sku_no,
-                    // skuName: sku.sku_name,
-                    // skuDescription: sku.sku_description,
                     price: sku.price,
                     stock: sku.stock,
-                    // skuImage: sku.sku_image,
                     unit: {
                         id: sku.unit.id,
                         name: sku.unit.name,
@@ -482,6 +476,155 @@ class ProductService {
                 totalItems: count,
                 totalPages: Math.ceil(count / parseInt(limit)),
             },
+        };
+    };
+    static customerGetListProduct = async ({
+        page = 1,
+        limit = 20,
+        searchText = "",
+    }) => {
+        const offset = (page - 1) * limit;
+        const { rows: products, count } = await findAllProduct({
+            offset: offset,
+            limit: limit,
+        });
+
+        return {
+            items: products.map((product) => ({
+                productId: product.product_id,
+                productName: product.product_name,
+                productDesc: product.product_desc,
+                productStatus:
+                    product.product_status === 1 ? "available" : "unavailable",
+                productAttrs: JSON.parse(product.product_attrs),
+                thumbnail: product.thumbnail,
+                sort: product.sort,
+                isActive: !!product.is_active,
+                isDeleted: !!product.is_deleted,
+                brand: {
+                    id: product.brand.id,
+                    name: product.brand.brand_name,
+                },
+                category: {
+                    id: product.category.id,
+                    name: product.category.name,
+                },
+                sku: product.sku.map((item) => {
+                    return {
+                        skuNo: item.sku_no,
+                        price: item.price,
+                        stock: item.stock,
+                        unit: {
+                            id: item.unit.id,
+                            name: item.unit.name,
+                        },
+                        isDefault: item.is_default,
+                        isDeleted: item.is_deleted,
+                    };
+                }),
+            })),
+            meta: {
+                currentPage: page,
+                itemsPerPage: parseInt(limit),
+                totalItems: count,
+                totalPages: Math.ceil(count / parseInt(limit)),
+            },
+        };
+    };
+    static customerGetProductDetail = async (productId) => {
+        const product = await getDetailProduct(productId);
+
+        if (!product) {
+            throw new NotFoundError("Product not found");
+        }
+
+        // Tạo một map từ conversionUnit id đến baseUnit id và tỷ lệ chuyển đổi
+        const conversionMap = new Map();
+        product.unitConversion.forEach((uc) => {
+            if (!conversionMap.has(uc.conversionUnit.id)) {
+                conversionMap.set(uc.conversionUnit.id, []);
+            }
+            conversionMap.get(uc.conversionUnit.id).push({
+                baseUnitId: uc.baseUnit.id,
+                rateConversion: uc.rate_conversion,
+            });
+        });
+
+        // Tạo một map từ unit id đến stock của sku
+        const skuStockMap = new Map();
+        product.sku.forEach((sku) => {
+            if (!skuStockMap.has(sku.unit.id)) {
+                skuStockMap.set(sku.unit.id, 0);
+            }
+            skuStockMap.set(
+                sku.unit.id,
+                skuStockMap.get(sku.unit.id) + sku.stock
+            );
+        });
+
+        // Tính toán available và stockAvailable cho mỗi SKU
+        const skuList = product.sku.map((sku) => {
+            let stockAvailable = 0;
+
+            // Tìm tất cả các đơn vị cơ sở có thể chuyển đổi thành đơn vị của SKU hiện tại
+            const baseUnits = conversionMap.get(sku.unit.id) || [];
+            baseUnits.forEach(({ baseUnitId, rateConversion }) => {
+                // Thêm stock khả dụng từ các đơn vị cơ sở
+                if (skuStockMap.has(baseUnitId)) {
+                    stockAvailable +=
+                        skuStockMap.get(baseUnitId) * rateConversion;
+                }
+            });
+
+            const available = sku.stock + stockAvailable > 0;
+
+            return {
+                skuNo: sku.sku_no,
+                price: sku.price,
+                stock: sku.stock,
+                unit: {
+                    id: sku.unit.id,
+                    name: sku.unit.name,
+                },
+                isDefault: !!sku.is_default,
+                isDeleted: !!sku.is_deleted,
+                stockAvailable: stockAvailable,
+                available: available,
+            };
+        });
+
+        return {
+            productId: product.product_id,
+            productName: product.product_name,
+            productDesc: product.product_desc,
+            productStatus:
+                product.product_status === 1 ? "available" : "unavailable",
+            productAttrs: JSON.parse(product.product_attrs),
+            thumbnail: product.thumbnail,
+            sort: product.sort,
+            isActive: product.is_active,
+            isDeleted: product.is_deleted,
+            brand: {
+                id: product.brand.id,
+                name: product.brand.brand_name,
+            },
+            category: {
+                id: product.category.id,
+                name: product.category.name,
+            },
+            unitConversion: product.unitConversion.map((uc) => ({
+                id: uc.id,
+                baseUnit: {
+                    id: uc.baseUnit.id,
+                    name: uc.baseUnit.name,
+                },
+                conversionUnit: {
+                    id: uc.conversionUnit.id,
+                    name: uc.conversionUnit.name,
+                },
+                rateConversion: uc.rate_conversion,
+            })),
+            sku: skuList,
         };
     };
 }

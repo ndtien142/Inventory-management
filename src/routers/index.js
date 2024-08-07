@@ -11,10 +11,12 @@ router.use(apiKey);
 router.use(permission("0000"));
 
 router.use("/account", require("./access"));
+router.use("/product", require("./customer-product"));
 
 router.use("/unit", require("./unit"));
 router.use("/brand", require("./brand"));
 router.use("/category", require("./category"));
+router.use("/address", require("./address"));
 
 router.use("/admin/role", require("./role"));
 router.use("/admin/user", require("./user"));

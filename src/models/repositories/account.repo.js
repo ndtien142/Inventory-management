@@ -73,6 +73,7 @@ const getAccountProfile = async (userId) => {
                 model: db.Role,
                 as: "role",
             },
+            { model: db.Profile, as: "profile" },
         ],
     });
     return account;

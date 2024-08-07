@@ -14,9 +14,10 @@ function model(sequelize) {
         state_province: { type: DataTypes.STRING(100), allowNull: false },
         postal_code: { type: DataTypes.STRING(20), allowNull: false },
         country: { type: DataTypes.STRING(100), allowNull: false },
+        is_default: { type: DataTypes.BOOLEAN, allowNull: false },
+        phone_number: { type: DataTypes.STRING(255), allowNull: false },
         is_deleted: {
             type: DataTypes.BOOLEAN,
-            // defaultValue: false,
             allowNull: true,
         },
     };
