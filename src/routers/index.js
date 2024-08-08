@@ -12,6 +12,7 @@ router.use(permission("0000"));
 
 router.use("/account", require("./access"));
 router.use("/product", require("./customer-product"));
+router.use("/payment", require("./payment"));
 
 router.use("/unit", require("./unit"));
 router.use("/brand", require("./brand"));
@@ -19,6 +20,7 @@ router.use("/category", require("./category"));
 router.use("/address", require("./address"));
 router.use("/order", require("./order"));
 
+router.use("/admin/order", require("./order-admin"));
 router.use("/admin/role", require("./role"));
 router.use("/admin/user", require("./user"));
 router.use("/admin/product", require("./product"));

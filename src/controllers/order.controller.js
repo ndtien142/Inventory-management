@@ -13,6 +13,12 @@ class OrderController {
             }),
         }).send(res);
     };
+    getOrderStatistics = async (req, res, next) => [
+        new SuccessResponse({
+            message: "Get order statistics successfully",
+            metadata: await orderService.getOrderStatistics(),
+        }).send(res),
+    ];
 }
 
 module.exports = new OrderController();

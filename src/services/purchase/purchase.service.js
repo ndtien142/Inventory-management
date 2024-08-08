@@ -140,6 +140,7 @@ class PurchaseService {
                     },
                 };
             }),
+            createDate: foundPurchase.create_time,
         };
     }
 

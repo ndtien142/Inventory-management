@@ -5,12 +5,14 @@ class PaymentService {
         const paymentMethods = await db.PaymentMethod.findAll({
             where: { is_active: true },
         });
-        return {
-            id: paymentMethods.id,
-            name: paymentMethods.name,
-            description: paymentMethods.description,
-            isActive: paymentMethods.is_active,
-        };
+        return paymentMethods.map((item) => {
+            return {
+                id: item.id,
+                name: item.name,
+                description: item.description,
+                isActive: item.is_active,
+            };
+        });
     };
 }
 

@@ -3,7 +3,7 @@
 const { ORDER_STATUS } = require("../../common/common.constants");
 const { BadRequestError } = require("../../core/error.response");
 const db = require("../../dbs/init.sqlserver");
-const { Op } = require("sequelize");
+const { Op, fn, col, literal } = require("sequelize");
 
 class OrderService {
     static async validateOrder({
@@ -237,6 +237,67 @@ class OrderService {
             console.error("Error creating order:", error);
             throw error;
         }
+    }
+    static async getOrderStatistics() {
+        const allOrders = await db.Order.findAll({
+            attributes: [
+                [literal(`'Tất cả'`), "name"],
+                [fn("COUNT", col("id")), "numberOfOrder"],
+                [fn("SUM", col("total")), "totalAmount"],
+                [literal("100"), "percentageOfTotal"],
+            ],
+            raw: true,
+        });
+
+        const statusOrders = await db.Order.findAll({
+            attributes: [
+                [
+                    literal(`CASE
+                        WHEN order_status = ${ORDER_STATUS.PENDING} THEN N'Xác nhận'
+                        WHEN order_status = ${ORDER_STATUS.PROCESSING} THEN N'Xử lý'
+                        WHEN order_status = ${ORDER_STATUS.SHIPPED} THEN N'Vận chuyển'
+                        WHEN order_status = ${ORDER_STATUS.DELIVERED} THEN N'Giao thành công'
+                        WHEN order_status = ${ORDER_STATUS.CANCELLED} THEN N'Hủy'
+                    END`),
+                    "name",
+                ],
+                [fn("COUNT", col("id")), "numberOfOrder"],
+                [fn("SUM", col("total")), "totalAmount"],
+            ],
+            where: {
+                order_status: {
+                    [Op.in]: [
+                        ORDER_STATUS.PENDING,
+                        ORDER_STATUS.PROCESSING,
+                        ORDER_STATUS.SHIPPED,
+                        ORDER_STATUS.DELIVERED,
+                        ORDER_STATUS.CANCELLED,
+                    ],
+                },
+            },
+            group: ["order_status"],
+            raw: true,
+        });
+
+        const totalOrders = parseInt(allOrders[0].numberOfOrder, 10);
+        statusOrders.forEach((item) => {
+            item.percentageOfTotal =
+                totalOrders > 0
+                    ? (parseInt(item.numberOfOrder, 10) / totalOrders) * 100
+                    : 0;
+        });
+
+        const statistics = [
+            {
+                name: "Tất cả",
+                numberOfOrder: allOrders[0].numberOfOrder,
+                totalAmount: parseFloat(allOrders[0].totalAmount) || 0,
+                percentageOfTotal: 100,
+            },
+            ...statusOrders,
+        ];
+
+        return statistics;
     }
 }
 
