@@ -3,7 +3,7 @@
 const { ORDER_STATUS } = require("../../common/common.constants");
 const { BadRequestError } = require("../../core/error.response");
 const db = require("../../dbs/init.sqlserver");
-const { Op, fn, col, literal } = require("sequelize");
+const { Op, fn, col, literal, where } = require("sequelize");
 
 class OrderService {
     static async validateOrder({
@@ -298,6 +298,100 @@ class OrderService {
         ];
 
         return statistics;
+    }
+    static async getAllOrder({
+        orderStatus = null,
+        searchText = "",
+        page = 1,
+        limit = 20,
+    }) {
+        let searchParams = {};
+        if (orderStatus) {
+            searchParams.order_status = orderStatus;
+        }
+        if (searchText) {
+            searchParams = {
+                ...searchParams,
+                [Op.or]: [
+                    { customer_name: { [Op.like]: `%${searchText}%` } },
+                    { order_no: { [Op.like]: `%${searchText}%` } },
+                ],
+            };
+        }
+        const offset = (parseInt(page) - 1) * parseInt(limit);
+        const { rows: listOrder, count } = await db.Order.findAndCountAll({
+            offset: offset,
+            limit: parseInt(limit),
+            where: searchParams,
+            order: [["create_time", "DESC"]],
+            include: [
+                {
+                    model: db.Account,
+                    as: "user",
+                },
+                {
+                    model: db.CustomerAddress,
+                    as: "address",
+                },
+                {
+                    model: db.PaymentMethod,
+                    as: "paymentMethod",
+                },
+                {
+                    model: db.SKU,
+                    include: { model: db.Unit, as: "unit" },
+                },
+            ],
+        });
+
+        return {
+            items: listOrder.map((order) => {
+                return {
+                    id: order.id,
+                    totalAmount: order.total,
+                    orderStatus: order.order_status,
+                    createTime: order.create_time,
+                    user: {
+                        userCode: order.user.user_code,
+                        username: order.user.username,
+                        isActive: order.user.is_active,
+                        isBlock: order.user.is_block,
+                    },
+                    address: {
+                        id: order.address.id,
+                        addressLine1: order.address.address_line1,
+                        addressLine2: order.address.address_line2,
+                        city: order.address.city,
+                        stateProvince: order.address.state_province,
+                        postalCode: order.address.postal_code,
+                        phoneNumber: order.address.phone_number,
+                    },
+                    paymentMethod: {
+                        id: order.paymentMethod.id,
+                        name: order.paymentMethod.name,
+                        description: order.paymentMethod.description,
+                    },
+                    orderLineItems: order.SKUs.map((lineItem) => {
+                        return {
+                            skuNo: lineItem.sku_no,
+                            quantity: lineItem.OrderLineItem.quantity,
+                            pricePerUnit: lineItem.OrderLineItem.price_per_unit,
+                            subTotal: lineItem.OrderLineItem.sub_total,
+                            unit: {
+                                id: lineItem.unit.id,
+                                name: lineItem.unit.name,
+                            },
+                        };
+                    }),
+                };
+            }),
+            meta: {
+                currentPage: parseInt(page),
+                itemsPerPage: parseInt(limit),
+                totalPages: Math.ceil(count / parseInt(limit)),
+                totalItems: count,
+            },
+        };
     }
 }
 

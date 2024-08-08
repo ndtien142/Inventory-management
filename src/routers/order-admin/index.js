@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.use(authenticationV2);
 
+router.get("", asyncHandler(orderController.getAllOrder));
 router.get(
     "/order-statistics",
     asyncHandler(orderController.getOrderStatistics)

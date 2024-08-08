@@ -19,6 +19,12 @@ class OrderController {
             metadata: await orderService.getOrderStatistics(),
         }).send(res),
     ];
+    getAllOrder = async (req, res, next) => [
+        new SuccessResponse({
+            message: "Get order statistics successfully",
+            metadata: await orderService.getAllOrder(req.query),
+        }).send(res),
+    ];
 }
 
 module.exports = new OrderController();
