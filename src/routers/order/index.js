@@ -8,6 +8,14 @@ const router = express.Router();
 
 router.use(authenticationV2);
 
+router.get("", asyncHandler(orderController.getListCustomerOrder));
+router.get(
+    "/statistics",
+    asyncHandler(orderController.getCustomerOrderStatistics)
+);
+router.get("/:id", asyncHandler(orderController.getDetailCustomerOrder));
+
 router.post("", asyncHandler(orderController.createOrder));
+router.patch("/:id", asyncHandler(orderController.customerCancelOrder));
 
 module.exports = router;

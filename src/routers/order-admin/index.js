@@ -13,5 +13,7 @@ router.get(
     "/order-statistics",
     asyncHandler(orderController.getOrderStatistics)
 );
+router.get("/:id", asyncHandler(orderController.getDetailOrder));
+router.patch("/:id", asyncHandler(orderController.updateOrderStatus));
 
 module.exports = router;

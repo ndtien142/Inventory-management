@@ -1,7 +1,7 @@
 "use strict";
 
 const { ORDER_STATUS } = require("../../common/common.constants");
-const { BadRequestError } = require("../../core/error.response");
+const { BadRequestError, NotFoundError } = require("../../core/error.response");
 const db = require("../../dbs/init.sqlserver");
 const { Op, fn, col, literal, where } = require("sequelize");
 
@@ -299,6 +299,69 @@ class OrderService {
 
         return statistics;
     }
+    static async getOrderCustomerStatistics(userCode) {
+        const allOrders = await db.Order.findAll({
+            where: { fk_user_code: userCode },
+            attributes: [
+                [literal(`'Tất cả'`), "name"],
+                [fn("COUNT", col("id")), "numberOfOrder"],
+                [fn("SUM", col("total")), "totalAmount"],
+                [literal("100"), "percentageOfTotal"],
+            ],
+            raw: true,
+        });
+
+        const statusOrders = await db.Order.findAll({
+            attributes: [
+                [
+                    literal(`CASE
+                        WHEN order_status = ${ORDER_STATUS.PENDING} THEN N'Xác nhận'
+                        WHEN order_status = ${ORDER_STATUS.PROCESSING} THEN N'Xử lý'
+                        WHEN order_status = ${ORDER_STATUS.SHIPPED} THEN N'Vận chuyển'
+                        WHEN order_status = ${ORDER_STATUS.DELIVERED} THEN N'Giao thành công'
+                        WHEN order_status = ${ORDER_STATUS.CANCELLED} THEN N'Hủy'
+                    END`),
+                    "name",
+                ],
+                [fn("COUNT", col("id")), "numberOfOrder"],
+                [fn("SUM", col("total")), "totalAmount"],
+            ],
+            where: {
+                fk_user_code: userCode,
+                order_status: {
+                    [Op.in]: [
+                        ORDER_STATUS.PENDING,
+                        ORDER_STATUS.PROCESSING,
+                        ORDER_STATUS.SHIPPED,
+                        ORDER_STATUS.DELIVERED,
+                        ORDER_STATUS.CANCELLED,
+                    ],
+                },
+            },
+            group: ["order_status"],
+            raw: true,
+        });
+
+        const totalOrders = parseInt(allOrders[0].numberOfOrder, 10);
+        statusOrders.forEach((item) => {
+            item.percentageOfTotal =
+                totalOrders > 0
+                    ? (parseInt(item.numberOfOrder, 10) / totalOrders) * 100
+                    : 0;
+        });
+
+        const statistics = [
+            {
+                name: "Tất cả",
+                numberOfOrder: allOrders[0].numberOfOrder,
+                totalAmount: parseFloat(allOrders[0].totalAmount) || 0,
+                percentageOfTotal: 100,
+            },
+            ...statusOrders,
+        ];
+
+        return statistics;
+    }
     static async getAllOrder({
         orderStatus = null,
         searchText = "",
@@ -392,6 +455,361 @@ class OrderService {
                 totalItems: count,
             },
         };
+    }
+    static async getDetailOrder(orderId) {
+        const foundOrder = await db.Order.findByPk(orderId, {
+            include: [
+                {
+                    model: db.Account,
+                    as: "user",
+                },
+                {
+                    model: db.CustomerAddress,
+                    as: "address",
+                },
+                {
+                    model: db.PaymentMethod,
+                    as: "paymentMethod",
+                },
+                {
+                    model: db.SKU,
+                    include: { model: db.Unit, as: "unit" },
+                },
+            ],
+        });
+        if (!foundOrder) throw new NotFoundError("Order not found");
+        return {
+            id: foundOrder.id,
+            totalAmount: foundOrder.total,
+            orderStatus: foundOrder.order_status,
+            createTime: foundOrder.create_time,
+            user: {
+                userCode: foundOrder.user.user_code,
+                username: foundOrder.user.username,
+                isActive: foundOrder.user.is_active,
+                isBlock: foundOrder.user.is_block,
+            },
+            address: {
+                id: foundOrder.address.id,
+                addressLine1: foundOrder.address.address_line1,
+                addressLine2: foundOrder.address.address_line2,
+                city: foundOrder.address.city,
+                stateProvince: foundOrder.address.state_province,
+                postalCode: foundOrder.address.postal_code,
+                phoneNumber: foundOrder.address.phone_number,
+            },
+            paymentMethod: {
+                id: foundOrder.paymentMethod.id,
+                name: foundOrder.paymentMethod.name,
+                description: foundOrder.paymentMethod.description,
+            },
+            orderLineItems: foundOrder.SKUs.map((lineItem) => {
+                return {
+                    skuNo: lineItem.sku_no,
+                    quantity: lineItem.OrderLineItem.quantity,
+                    pricePerUnit: lineItem.OrderLineItem.price_per_unit,
+                    subTotal: lineItem.OrderLineItem.sub_total,
+                    unit: {
+                        id: lineItem.unit.id,
+                        name: lineItem.unit.name,
+                    },
+                };
+            }),
+        };
+    }
+    static async updateOrder(orderId, updatedData) {
+        const t = await db.sequelize.transaction();
+
+        try {
+            const order = await db.Order.findByPk(orderId, {
+                include: [
+                    {
+                        model: db.SKU,
+                        include: { model: db.Unit, as: "unit" },
+                    },
+                ],
+                transaction: t,
+            });
+
+            if (!order) throw new NotFoundError("Order not found");
+
+            // Kiểm tra trạng thái của đơn hàng
+            if (
+                order.order_status === ORDER_STATUS.DELIVERED ||
+                order.order_status === ORDER_STATUS.CANCELLED
+            ) {
+                throw new BadRequestError(
+                    "Cannot update order with status 'delivered' or 'cancelled'"
+                );
+            }
+
+            // Cập nhật thông tin order
+            await order.update(
+                { order_status: updatedData.orderStatus },
+                { transaction: t }
+            );
+
+            // Nếu order bị hủy, hoàn lại stock cho SKU
+            if (updatedData.orderStatus === ORDER_STATUS.CANCELLED) {
+                const orderLineItems = order.SKUs;
+
+                for (let item of orderLineItems) {
+                    let sku = await db.SKU.findOne({
+                        where: { sku_no: item.sku_no },
+                        transaction: t,
+                    });
+
+                    if (!sku) {
+                        throw new BadRequestError(
+                            `SKU not found: ${item.sku_no}`
+                        );
+                    }
+
+                    await sku.update(
+                        { stock: sku.stock + item.OrderLineItem.quantity },
+                        { transaction: t }
+                    );
+                }
+            }
+
+            await t.commit();
+            return order;
+        } catch (error) {
+            await t.rollback();
+            console.error("Error updating order:", error);
+            throw error;
+        }
+    }
+    static async getCustomerOrders({
+        userCode,
+        orderStatus = null,
+        page = 1,
+        limit = 20,
+    }) {
+        let searchParams = {};
+        console.log("serach status: ", orderStatus);
+        if (orderStatus) {
+            searchParams.order_status = orderStatus;
+        }
+        searchParams = {
+            ...searchParams,
+            fk_user_code: userCode,
+        };
+        console.log("serach params: ", searchParams);
+        const offset = (parseInt(page) - 1) * parseInt(limit);
+        const { rows: orders, count } = await db.Order.findAndCountAll({
+            where: searchParams,
+            offset: offset,
+            limit: parseInt(limit),
+            order: [["create_time", "DESC"]],
+            include: [
+                {
+                    model: db.CustomerAddress,
+                    as: "address",
+                },
+                {
+                    model: db.PaymentMethod,
+                    as: "paymentMethod",
+                },
+            ],
+        });
+
+        return {
+            items: orders.map((order) => {
+                return {
+                    id: order.id,
+                    totalAmount: order.total,
+                    orderStatus: order.order_status,
+                    createTime: order.create_time,
+                    address: {
+                        id: order.address.id,
+                        addressLine1: order.address.address_line1,
+                        addressLine2: order.address.address_line2,
+                        city: order.address.city,
+                        stateProvince: order.address.state_province,
+                        postalCode: order.address.postal_code,
+                        phoneNumber: order.address.phone_number,
+                    },
+                    paymentMethod: {
+                        id: order.paymentMethod.id,
+                        name: order.paymentMethod.name,
+                        description: order.paymentMethod.description,
+                    },
+                };
+            }),
+            meta: {
+                currentPage: parseInt(page),
+                itemsPerPage: parseInt(limit),
+                totalPages: Math.ceil(count / parseInt(limit)),
+                totalItems: count,
+            },
+        };
+    }
+    static async getCustomerOrderDetail(userCode, orderId) {
+        const order = await db.Order.findOne({
+            where: {
+                id: orderId,
+                fk_user_code: userCode,
+            },
+            include: [
+                {
+                    model: db.Account,
+                    as: "user",
+                },
+                {
+                    model: db.CustomerAddress,
+                    as: "address",
+                },
+                {
+                    model: db.PaymentMethod,
+                    as: "paymentMethod",
+                },
+                {
+                    model: db.SKU,
+                    include: { model: db.Unit, as: "unit" },
+                },
+            ],
+        });
+
+        if (!order) throw new NotFoundError("Order not found");
+
+        return {
+            id: order.id,
+            totalAmount: order.total,
+            orderStatus: order.order_status,
+            createTime: order.create_time,
+            user: {
+                userCode: order.user.user_code,
+                username: order.user.username,
+                isActive: order.user.is_active,
+                isBlock: order.user.is_block,
+            },
+            address: {
+                id: order.address.id,
+                addressLine1: order.address.address_line1,
+                addressLine2: order.address.address_line2,
+                city: order.address.city,
+                stateProvince: order.address.state_province,
+                postalCode: order.address.postal_code,
+                phoneNumber: order.address.phone_number,
+            },
+            paymentMethod: {
+                id: order.paymentMethod.id,
+                name: order.paymentMethod.name,
+                description: order.paymentMethod.description,
+            },
+            orderLineItems: order.SKUs.map((lineItem) => {
+                return {
+                    skuNo: lineItem.sku_no,
+                    quantity: lineItem.OrderLineItem.quantity,
+                    pricePerUnit: lineItem.OrderLineItem.price_per_unit,
+                    subTotal: lineItem.OrderLineItem.sub_total,
+                    unit: {
+                        id: lineItem.unit.id,
+                        name: lineItem.unit.name,
+                    },
+                };
+            }),
+        };
+    }
+    static async cancelOrderByCustomer(userCode, orderId) {
+        const t = await db.sequelize.transaction();
+
+        try {
+            const order = await db.Order.findOne({
+                where: {
+                    id: orderId,
+                    fk_user_code: userCode,
+                    order_status: {
+                        [Op.in]: [
+                            ORDER_STATUS.PENDING,
+                            ORDER_STATUS.PROCESSING,
+                        ],
+                    },
+                },
+                include: [
+                    {
+                        model: db.SKU,
+                        include: { model: db.Unit, as: "unit" },
+                    },
+                ],
+                transaction: t,
+            });
+
+            if (!order) {
+                throw new NotFoundError(
+                    "Order not found or cannot be canceled"
+                );
+            }
+
+            const orderLineItems = order.SKUs;
+
+            const restockPromises = orderLineItems.map(async (lineItem) => {
+                const sku = await db.SKU.findOne({
+                    where: { sku_no: lineItem.sku_no },
+                    transaction: t,
+                });
+
+                if (!sku) {
+                    throw new NotFoundError(
+                        `SKU not found: ${lineItem.sku_no}`
+                    );
+                }
+
+                await sku.update(
+                    { stock: sku.stock + lineItem.OrderLineItem.quantity },
+                    { transaction: t }
+                );
+            });
+
+            await Promise.all(restockPromises);
+
+            await order.update(
+                { order_status: ORDER_STATUS.CANCELLED },
+                { transaction: t }
+            );
+
+            await t.commit();
+            return { message: "Order has been canceled successfully" };
+        } catch (error) {
+            await t.rollback();
+            console.error("Error canceling order:", error);
+            throw error;
+        }
+    }
+    static async confirmReceivedOrder(userCode, orderId) {
+        const t = await db.sequelize.transaction();
+
+        try {
+            const order = await db.Order.findOne({
+                where: {
+                    id: orderId,
+                    fk_user_code: userCode,
+                    order_status: ORDER_STATUS.SHIPPED,
+                },
+                transaction: t,
+            });
+
+            if (!order) {
+                throw new NotFoundError(
+                    "Order not found or cannot be confirmed as received"
+                );
+            }
+
+            await order.update(
+                { order_status: ORDER_STATUS.DELIVERED },
+                { transaction: t }
+            );
+
+            await t.commit();
+            return {
+                message: "Order has been confirmed as received successfully",
+            };
+        } catch (error) {
+            await t.rollback();
+            console.error("Error confirming order as received:", error);
+            throw error;
+        }
     }
 }
 
