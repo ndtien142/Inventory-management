@@ -41,10 +41,10 @@ class OrderController {
         new SuccessResponse({
             message: "Update order status successfully",
             metadata: await orderService.getCustomerOrders({
-                orderStatus: req.params.orderStatus,
+                orderStatus: req.query.orderStatus,
                 userCode: req.user.userCode,
-                limit: req.params.limit,
-                page: req.params.params,
+                limit: req.query.limit,
+                page: req.query.page,
             }),
         }).send(res);
     };

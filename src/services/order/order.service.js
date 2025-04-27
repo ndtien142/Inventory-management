@@ -241,7 +241,7 @@ class OrderService {
     static async getOrderStatistics() {
         const allOrders = await db.Order.findAll({
             attributes: [
-                [literal(`'Tất cả'`), "name"],
+                [literal(`'Tất cả đơn hàng'`), "name"],
                 [fn("COUNT", col("id")), "numberOfOrder"],
                 [fn("SUM", col("total")), "totalAmount"],
                 [literal("100"), "percentageOfTotal"],
@@ -253,11 +253,11 @@ class OrderService {
             attributes: [
                 [
                     literal(`CASE
-                        WHEN order_status = ${ORDER_STATUS.PENDING} THEN N'Xác nhận'
-                        WHEN order_status = ${ORDER_STATUS.PROCESSING} THEN N'Xử lý'
-                        WHEN order_status = ${ORDER_STATUS.SHIPPED} THEN N'Vận chuyển'
-                        WHEN order_status = ${ORDER_STATUS.DELIVERED} THEN N'Giao thành công'
-                        WHEN order_status = ${ORDER_STATUS.CANCELLED} THEN N'Hủy'
+                        WHEN order_status = ${ORDER_STATUS.PENDING} THEN N'Chờ xác nhận'
+                        WHEN order_status = ${ORDER_STATUS.PROCESSING} THEN N'Đang xử lý'
+                        WHEN order_status = ${ORDER_STATUS.SHIPPED} THEN N'Đang vận chuyển'
+                        WHEN order_status = ${ORDER_STATUS.DELIVERED} THEN N'Đơn hàng đã hoàn thành'
+                        WHEN order_status = ${ORDER_STATUS.CANCELLED} THEN N'Đơn hàng hủy'
                     END`),
                     "name",
                 ],
@@ -289,7 +289,7 @@ class OrderService {
 
         const statistics = [
             {
-                name: "Tất cả",
+                name: "Tất cả đơn hàng",
                 numberOfOrder: allOrders[0].numberOfOrder,
                 totalAmount: parseFloat(allOrders[0].totalAmount) || 0,
                 percentageOfTotal: 100,
@@ -303,7 +303,7 @@ class OrderService {
         const allOrders = await db.Order.findAll({
             where: { fk_user_code: userCode },
             attributes: [
-                [literal(`'Tất cả'`), "name"],
+                [literal(`'Tất cả đơn hàng'`), "name"],
                 [fn("COUNT", col("id")), "numberOfOrder"],
                 [fn("SUM", col("total")), "totalAmount"],
                 [literal("100"), "percentageOfTotal"],
@@ -315,11 +315,11 @@ class OrderService {
             attributes: [
                 [
                     literal(`CASE
-                        WHEN order_status = ${ORDER_STATUS.PENDING} THEN N'Xác nhận'
-                        WHEN order_status = ${ORDER_STATUS.PROCESSING} THEN N'Xử lý'
-                        WHEN order_status = ${ORDER_STATUS.SHIPPED} THEN N'Vận chuyển'
-                        WHEN order_status = ${ORDER_STATUS.DELIVERED} THEN N'Giao thành công'
-                        WHEN order_status = ${ORDER_STATUS.CANCELLED} THEN N'Hủy'
+                        WHEN order_status = ${ORDER_STATUS.PENDING} THEN N'Chờ xác nhận'
+                        WHEN order_status = ${ORDER_STATUS.PROCESSING} THEN N'Đang xử lý'
+                        WHEN order_status = ${ORDER_STATUS.SHIPPED} THEN N'Đang vận chuyển'
+                        WHEN order_status = ${ORDER_STATUS.DELIVERED} THEN N'Đơn hàng đã hoàn thành'
+                        WHEN order_status = ${ORDER_STATUS.CANCELLED} THEN N'Đơn hàng hủy'
                     END`),
                     "name",
                 ],
@@ -352,7 +352,7 @@ class OrderService {
 
         const statistics = [
             {
-                name: "Tất cả",
+                name: "Tất cả đơn hàng",
                 numberOfOrder: allOrders[0].numberOfOrder,
                 totalAmount: parseFloat(allOrders[0].totalAmount) || 0,
                 percentageOfTotal: 100,

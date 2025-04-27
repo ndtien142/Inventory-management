@@ -2,6 +2,7 @@
 
 const { BadRequestError } = require("../../core/error.response");
 const db = require("../../dbs/init.sqlserver");
+const { Op } = require("sequelize");
 const slugify = require("slugify");
 
 const createNewProduct = async ({
@@ -149,9 +150,16 @@ const getDetailProduct = async (productId) => {
     });
 };
 
-const findAllProduct = async ({ limit = 20, offset = 0 }) => {
+const findAllProduct = async ({ limit = 20, offset = 0, searchText = "" }) => {
+    let whereCondition = {};
+    if (searchText) {
+        whereCondition.product_name = {
+            [Op.like]: `%${searchText}%`,
+        };
+    }
     return await db.Product.findAndCountAll({
         limit: parseInt(limit),
+        where: whereCondition,
         offset: parseInt(offset),
         include: [
             {

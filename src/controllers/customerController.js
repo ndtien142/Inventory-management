@@ -18,6 +18,7 @@ class CustomerProductController {
             metadata: await ProductService.customerGetListProduct({
                 limit: req.query.limit,
                 page: req.query.page,
+                searchText: req.query.searchText,
             }),
         }).send(res);
     };

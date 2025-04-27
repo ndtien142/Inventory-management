@@ -1,5 +1,6 @@
 const { BadRequestError, NotFoundError } = require("../../core/error.response");
 const db = require("../../dbs/init.sqlserver");
+const { Op } = require("sequelize");
 const {
     createNewProduct,
     getDetailProduct,
@@ -485,6 +486,7 @@ class ProductService {
     }) => {
         const offset = (page - 1) * limit;
         const { rows: products, count } = await findAllProduct({
+            searchText: searchText,
             offset: offset,
             limit: limit,
         });

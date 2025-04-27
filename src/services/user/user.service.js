@@ -8,6 +8,7 @@ const {
 const { getRoleByName } = require("../../models/repositories/role.repo");
 const { generateUserCode } = require("../../utils");
 const { signUp } = require("../authentication/access.service");
+const { BadRequestError } = require("../../core/error.response");
 
 class UserService {
     static async createUser({
@@ -99,7 +100,7 @@ class UserService {
         try {
             const account = await db.Account.findByPk(userCode);
             if (!account) {
-                throw new Error("User not found");
+                throw new BadRequestError("User not found");
             }
 
             account.username = username;
